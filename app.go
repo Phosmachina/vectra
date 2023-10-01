@@ -1,6 +1,7 @@
 package main
 
 import (
+	"Vectra/src/model/i18n"
 	"encoding/csv"
 	"os"
 	"path/filepath"
@@ -22,11 +23,7 @@ func main() {
 		_ = loadData(path, lang, "")
 	}
 
-	// Generate Pug code and write to 'i18n.pug'.
-	//generatePugCodeToFile(dic, "gen/i18n.pug")
-
-	// Generate Go code and write to 'i18n_gen.go'.
-	generateGoCodeToFile(dic["en"], "gen/i18n_gen.go")
+	i18n.GenerateCode(dic["en"])
 }
 
 func loadData(path string, lang string, prefix string) error {

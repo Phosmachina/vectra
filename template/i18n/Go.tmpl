@@ -14,11 +14,12 @@ type (
 var ({{ range .Types }}
 	{{ .Name | Upper }} = {{ .Name }}Type{ {{ range .Fields }}
 		{{ .Name | Upper }}: {{ if .IsDirectory }}{{ .Name | Upper }}, {{ else }}func(args ...interface{}) string {
-				return call("{{ .Key }}", args)
+				return call("{{ .Key }}", args...)
 			},{{ end }}{{ end }}
-	} {{ end }}
+	}
+{{ end }}
 )
 
-func call (key string, args ...interface{}) string {
-	return GetInstance().Get(key, args)
+func call(key string, args ...interface{}) string {
+	return GetInstance().Get(key, args...)
 }
