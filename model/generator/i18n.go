@@ -13,14 +13,14 @@ type I18nConfig struct {
 }
 
 type I18n struct {
-	Generator
+	Generator[*I18nConfig]
 	dic map[string]string
 }
 
 func NewI18n(projectPath string, cfg *I18nConfig) *I18n {
 
 	config := cfg
-	generator := NewAbstractGenerator("i18n", Report{
+	generator := NewAbstractGenerator[*I18nConfig]("i18n", Report[*I18nConfig]{
 		Files: []SourceFile{
 			NewSourceFile("src/model/i18n/i18n_gen.go.tmpl", Static),
 			NewSourceFile("src/view/go/view_gen.go.tmpl", Static),
@@ -37,9 +37,7 @@ func NewI18n(projectPath string, cfg *I18nConfig) *I18n {
 }
 
 func (i *I18n) Generate() {
-	config := i.nextReport.Config.(I18nConfig)
-
-	path := filepath.Join(i.projectPath, config.DefaultLang)
+	path := filepath.Join(i.projectPath, i.nextReport.Config.DefaultLang)
 	_ = i.loadData(path, "")
 
 	var root = newFolder("", nil)
@@ -59,7 +57,6 @@ func (i *I18n) Generate() {
 	if err != nil {
 		// TODO print error
 	}
-
 }
 
 type TemplateData struct {

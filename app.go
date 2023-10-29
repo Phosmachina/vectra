@@ -81,6 +81,15 @@ func main() {
 						return nil
 					},
 				},
+				{
+					Name:  "core",
+					Usage: "Generate core part of the Vectra project",
+					Action: func(c *cli.Context) error {
+						log.Println("Copy core parts following configuration")
+						vectra.Generate("core")
+						return nil
+					},
+				},
 				// Add more subcommands as needed
 			},
 		},
@@ -106,7 +115,7 @@ func main() {
 	app.Action = func(c *cli.Context) error {
 		path := c.String("path")
 		log.Println("Summarizing the state of deployment for Vectra project at", path)
-		// Add your summary logic here
+		vectra.FullReport()
 		return nil
 	}
 

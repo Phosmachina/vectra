@@ -33,7 +33,7 @@ func NewVectra(projectPath string) *Vectra {
 	if err != nil {
 		vectra = defaultVectra
 	}
-	if yaml.Unmarshal(data, vectra) != nil {
+	if yaml.Unmarshal(data, &vectra) != nil {
 		vectra = defaultVectra
 	}
 	vectra.ProjectPath = projectPath

@@ -8,7 +8,6 @@ import (
 	"gopkg.in/yaml.v3"
 	"io"
 	"io/fs"
-	"log"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -21,7 +20,8 @@ var (
 	//go:embed template
 	EmbedFS embed.FS
 
-	FolderProject = ".vectra"
+	FolderProject  = ".vectra"
+	FolderTemplate = "template"
 )
 
 const (
@@ -38,9 +38,9 @@ const (
 	Skeleton             // Body functions to be filled later
 )
 
-type Report struct {
+type Report[T any] struct {
 	Files   []SourceFile `yaml:"files"`
-	Config  any          `yaml:"config"`
+	Config  T            `yaml:"config"`
 	Version int8         `yaml:"version"`
 }
 
@@ -58,7 +58,7 @@ func NewSourceFile(path string, kind int8) SourceFile {
 
 func NewDynSourceFile(path string, realpath string, kind int8) SourceFile {
 	return SourceFile{
-		TemplatePath: path,
+		TemplatePath: filepath.Join(FolderTemplate, path),
 		RealPath:     realpath,
 		Kind:         kind,
 		isTmpl:       strings.HasSuffix(path, ".tmpl"),
@@ -70,21 +70,21 @@ type IGenerator interface {
 	PrintReport()
 }
 
-type Generator struct {
+type Generator[T any] struct {
 	Name        string
 	projectPath string
 
-	lastReport Report
-	nextReport Report
+	lastReport Report[T]
+	nextReport Report[T]
 }
 
-func NewAbstractGenerator(
+func NewAbstractGenerator[T any](
 	name string,
-	report Report,
+	report Report[T],
 	projectPath string,
-) *Generator {
+) *Generator[T] {
 
-	generator := Generator{
+	generator := Generator[T]{
 		Name:        name,
 		projectPath: projectPath,
 		nextReport:  report,
@@ -95,29 +95,36 @@ func NewAbstractGenerator(
 	return &generator
 }
 
-func (g *Generator) init() {
+func (g *Generator[T]) init() {
 	data, err := os.ReadFile(filepath.Join(
 		g.projectPath,
 		FolderProject,
 		g.Name+"_report.yml",
 	))
 	if err != nil {
-		g.lastReport = Report{}
+		g.lastReport = Report[T]{}
 		return
 	}
-	if err := yaml.Unmarshal(data, g.lastReport); err != nil {
+	if err := yaml.Unmarshal(data, &g.lastReport); err != nil {
 		// TODO print error
 	}
 }
 
-func (g *Generator) Generate(data any) {
+func (g *Generator[T]) Generate(data any) {
 
 	for _, file := range g.nextReport.Files {
+
+		outputFile := filepath.Join(g.projectPath, file.RealPath)
+
+		dir := filepath.Dir(outputFile)
+		if os.MkdirAll(dir, 0744) != nil {
+			// TODO print error
+			continue
+		}
 
 		if !file.isTmpl {
 			f, _ := EmbedFS.Open(file.TemplatePath)
 			stat, _ := f.Stat()
-			outputFile := filepath.Join(g.projectPath, file.RealPath)
 
 			var err error
 			if stat.IsDir() {
@@ -137,13 +144,7 @@ func (g *Generator) Generate(data any) {
 			continue
 		}
 
-		dir := filepath.Dir(file.RealPath)
-		if os.MkdirAll(dir, 0744) != nil {
-			// TODO print error
-			continue
-		}
-
-		out, err := os.Create(file.RealPath)
+		out, err := os.Create(outputFile)
 		if err != nil {
 			// TODO print error
 			continue
@@ -169,10 +170,10 @@ func (g *Generator) Generate(data any) {
 	g.updateReport()
 }
 
-func (g *Generator) updateReport() {
+func (g *Generator[T]) updateReport() {
 
 	for i, file := range g.nextReport.Files {
-		hash, err := calculateHash(file.TemplatePath)
+		hash, err := calculateHash(filepath.Join(g.projectPath, file.RealPath))
 		if err != nil {
 			continue
 		}
@@ -190,7 +191,7 @@ func (g *Generator) updateReport() {
 	)
 
 	if os.WriteFile(path, data, 0644) != nil {
-		log.Printf(
+		fmt.Printf(
 			"Failed to write report for %s generator at: %s\n",
 			g.Name,
 			path,
@@ -198,24 +199,24 @@ func (g *Generator) updateReport() {
 	}
 }
 
-func (g *Generator) PrintReport() {
+func (g *Generator[T]) PrintReport() {
 
-	log.Printf("\n======= %s generator report (v%d) =======\n\n", g.Name, g.nextReport.Version)
+	fmt.Printf("======= %s generator report (v%d) =======\n", g.Name, g.nextReport.Version)
 
 	if len(g.lastReport.Files) == 0 {
-		log.Println("No report for this generator found.")
+		fmt.Println("No report for this generator found.")
 		return
 	}
 
 	if g.isWaitingForGeneration() {
 		printLogPrefix(Info, 0)
-		log.Println(
+		fmt.Println(
 			" The generator could be run to update files following the new configuration.")
 	}
 
 	if !g.isUpToDate() {
 		printLogPrefix(Info, 0)
-		log.Printf(
+		fmt.Printf(
 			" The generator could be run to update files following the new version ("+
 				"v%d → v%d).\n",
 			g.lastReport.Version,
@@ -223,7 +224,9 @@ func (g *Generator) PrintReport() {
 		)
 	}
 
-	for i, file := range g.nextReport.Files {
+	fmt.Println()
+
+	for i, file := range g.lastReport.Files {
 		hash, err := calculateHash(filepath.Join(g.projectPath, file.RealPath))
 		if err != nil {
 			printLogPrefix(Deleted, file.Kind)
@@ -232,16 +235,16 @@ func (g *Generator) PrintReport() {
 		} else {
 			printLogPrefix(Same, file.Kind)
 		}
-		log.Printf(" %s\n", file.RealPath)
+		fmt.Printf(" %s\n", file.RealPath)
 	}
 
 }
 
-func (g *Generator) isUpToDate() bool {
+func (g *Generator[T]) isUpToDate() bool {
 	return g.lastReport.Version == g.nextReport.Version
 }
 
-func (g *Generator) isWaitingForGeneration() bool {
+func (g *Generator[T]) isWaitingForGeneration() bool {
 	return !reflect.DeepEqual(g.nextReport.Config, g.lastReport.Config)
 }
 
