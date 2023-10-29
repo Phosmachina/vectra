@@ -1,0 +1,23 @@
+# The alpine go-image
+FROM golang:1.21-alpine
+
+# Create a directory for the app
+RUN mkdir /app
+
+# Copy executable files
+COPY website /app/
+
+# Copy business files
+COPY static/css/style.css /app/static/css/
+COPY static/js/main.js /app/static/js/
+COPY static/img/ /app/static/img/
+COPY static/favicon.ico /app/static/
+
+COPY data/i18n/ /app/data/i18n/
+COPY data/bin/ /app/data/bin/
+COPY data/config/configuration.yml /app/fallback/
+
+# Run the server executable
+
+WORKDIR /app
+CMD [ "/app/website" ]

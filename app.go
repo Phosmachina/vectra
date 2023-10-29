@@ -1,70 +1,117 @@
 package main
 
 import (
-	"Vectra/src/model/i18n"
-	"encoding/csv"
+	"Vectra/model"
+	"github.com/urfave/cli"
+	"log"
 	"os"
-	"path/filepath"
-	"strings"
-)
-
-var (
-	dic map[string]map[string]string
 )
 
 func main() {
 
-	dic = make(map[string]map[string]string)
+	var vectra *model.Vectra
 
-	langs := []string{"fr", "en"}
+	app := cli.NewApp()
+	app.Name = "vectra"
+	app.Usage = "Manage Vectra projects"
+	app.Version = "1.0.0"
 
-	for _, lang := range langs {
-		path := filepath.Join("i18n", lang)
-		_ = loadData(path, lang, "")
+	app.EnableBashCompletion = true
+
+	app.Before = func(c *cli.Context) error {
+		path := c.String("path")
+		vectra = model.NewVectra(path)
+		return nil
 	}
 
-	i18n.GenerateCode(dic["en"])
-}
+	app.Commands = []cli.Command{
+		{
+			Name:  "init",
+			Usage: "Initialize a folder with the default Vectra project file",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "path, p",
+					Value: "./",
+					Usage: "Path to the directory where the Vectra project file will be initialized",
+				},
+			},
+			Action: func(c *cli.Context) error {
+				path := c.String("path")
+				log.Println("Initializing Vectra project at", path)
+				vectra.Init()
+				return nil
+			},
+			OnUsageError: func(c *cli.Context, err error, isSubcommand bool) error {
+				log.Println("Initializing Vectra project at", vectra.ProjectPath)
+				return nil
+			},
+		},
+		{
+			Name:  "gen",
+			Usage: "Generate Vectra project templates",
+			Action: func(c *cli.Context) error {
+				return nil
+			},
+			Subcommands: []cli.Command{
+				{
+					Name:  "i18n",
+					Usage: "Generate the i18n part of the Vectra project",
+					Action: func(c *cli.Context) error {
+						log.Println("Generating i18n template")
+						vectra.Generate("i18n")
+						return nil
+					},
+				},
+				{
+					Name:  "service",
+					Usage: "Generate services part of the Vectra project",
+					Action: func(c *cli.Context) error {
+						log.Println("Generating model template")
+						//vectra.Generate("model")
+						// Add model generation logic here
+						return nil
+					},
+				},
+				{
+					Name:  "controller",
+					Usage: "Generate controllers part of the Vectra project",
+					Action: func(c *cli.Context) error {
+						log.Println("Generating controller template")
+						vectra.Generate("controller")
+						return nil
+					},
+				},
+				// Add more subcommands as needed
+			},
+		},
+		{
+			Name:  "update",
+			Usage: "Update Vectra project",
+			Action: func(c *cli.Context) error {
+				log.Println("Updating Vectra project")
+				// Add update logic here
+				return nil
+			},
+		},
+	}
 
-func loadData(path string, lang string, prefix string) error {
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:  "path, p",
+			Value: "./",
+			Usage: "Path to the Vectra project file or directory",
+		},
+	}
 
-	entries, err := os.ReadDir(path)
+	app.Action = func(c *cli.Context) error {
+		path := c.String("path")
+		log.Println("Summarizing the state of deployment for Vectra project at", path)
+		// Add your summary logic here
+		return nil
+	}
+
+	err := app.Run(os.Args)
 	if err != nil {
-		return err
+		log.Println(err)
 	}
-
-	for _, entry := range entries {
-		key := entry.Name()
-		if entry.IsDir() {
-			err := loadData(filepath.Join(path, key), lang, prefix+key+".")
-			if err != nil {
-				return err
-			}
-		} else if strings.HasSuffix(key, ".csv") {
-			if _, ok := dic[lang]; !ok {
-				dic[lang] = make(map[string]string)
-			}
-			fullKey := prefix + strings.TrimSuffix(key, ".csv")
-
-			data, err := os.ReadFile(filepath.Join(path, key))
-			if err != nil {
-				return err
-			}
-
-			reader := csv.NewReader(strings.NewReader(string(data)))
-			records, err := reader.ReadAll()
-			if err != nil {
-				return err
-			}
-
-			for _, record := range records {
-				if len(record) < 2 {
-					continue
-				}
-				dic[lang][fullKey+"."+record[0]] = strings.ReplaceAll(record[1], "\\n", "\n")
-			}
-		}
-	}
-
-	return nil
 }

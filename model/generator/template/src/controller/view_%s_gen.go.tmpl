@@ -1,0 +1,14 @@
+package controller
+
+import (
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/session"
+)
+
+type ViewController struct {
+	Controller
+}
+
+func NewViewController(r fiber.Router, store *session.Store) {
+	newViewController(r, store)
+}

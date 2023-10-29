@@ -1,0 +1,15 @@
+
+#notification-group
+    display: flex
+
+@mixin notification($accent)
+    background-color: $accent
+
+.notification-info
+    @include notification(blue)
+
+.notification-warn
+    @include notification(black)
+
+.notification-error
+    @include notification(black)

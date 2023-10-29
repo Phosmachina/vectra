@@ -1,0 +1,20 @@
+extends shared/layout
+
+
+block header
+
+    h1 Vectra
+
+    h2 Go Sass Pug Badger
+
+block content
+
+    p i18n test [error.NotFirstLaunch] - #{_i18n("error.NotFirstLaunch")}
+    p i18n test [view.index.day, 10] - #{_i18n("view.index.day", 10)}
+    p i18n test [view.index.day, 1] - #{_i18n("view.index.day", 1)}
+
+    p #{i18n.View.Index.Hello(ctx.Domain)}
+
+    if ctx.User.Role.Level > 0
+        p Hello, you are #{ctx.User.Role.Name}
+        button(onclick='test()') My Test Button

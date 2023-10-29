@@ -1,0 +1,113 @@
+
+@mixin container 
+    width: 100%
+    max-width: 100%
+    margin-left: auto
+    margin-right: auto
+    padding-left: 1rem
+    padding-right: 1rem
+
+    @media (min-width: 576px) 
+        max-width: 540px
+    
+
+    @media (min-width: 768px) 
+        max-width: 720px
+    
+
+    @media (min-width: 992px) 
+        max-width: 960px
+    
+
+    @media (min-width: 1200px) 
+        max-width: 1140px
+    
+
+
+@mixin flex 
+    display: flex
+
+
+@mixin flex-center 
+    @include flex
+    justify-content: center
+    align-items: center
+
+
+@mixin flex-wrap 
+    flex-wrap: wrap
+
+
+@mixin justify-between 
+    justify-content: space-between
+
+
+@mixin justify-center 
+    justify-content: center
+
+
+@mixin items-center 
+    align-items: center
+
+
+@mixin text-center 
+    text-align: center
+
+
+@mixin clearfix 
+    &::after 
+        content: ""
+        display: table
+        clear: both
+    
+
+
+@mixin sr-only 
+    position: absolute
+    width: 1px
+    height: 1px
+    padding: 0
+    margin: -1px
+    overflow: hidden
+    clip: rect(0, 0, 0, 0)
+    white-space: nowrap
+    border-width: 0
+
+
+@mixin visually-hidden 
+    position: absolute
+    width: 1px
+    height: 1px
+    padding: 0
+    margin: -1px
+    overflow: hidden
+    clip: rect(0, 0, 0, 0)
+    white-space: nowrap
+    border-width: 0
+
+
+@mixin visually-hidden-focusable 
+    &:active,
+    &:focus 
+        position: static
+        width: auto
+        height: auto
+        margin: 0
+        overflow: visible
+        clip: auto
+        white-space: inherit
+    
+
+
+@mixin sr-only-focusable 
+    &:active,
+    &:focus 
+        position: static
+        width: auto
+        height: auto
+        margin: 0
+        overflow: visible
+        clip: auto
+        white-space: inherit
+    
+

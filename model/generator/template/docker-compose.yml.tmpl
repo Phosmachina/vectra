@@ -1,0 +1,13 @@
+services:
+
+  vectra:
+    container_name: vectra
+    image: phosmachina/vectra
+    ports:
+      - "8100:8100"
+    environment:
+      - TZ=Europe/Paris
+    volumes:
+      - ./data/config:/app/data/config
+      - ./data/db:/app/data/db
+    restart: unless-stopped

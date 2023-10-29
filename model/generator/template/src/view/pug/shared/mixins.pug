@@ -1,0 +1,86 @@
+mixin head(ctx)
+    head
+        meta(charset='UTF-8')
+        meta(name='viewport' content='width=device-width, initial-scale=1.0')
+        meta(name='description' content='')
+        link(rel='icon' type='image/png' href=`http://static.${ctx.Domain}/favicon/favicon.ico`)
+        if ctx.IsDev
+            link(rel='stylesheet' href=`http://static.${ctx.Domain}/css/style.css`)
+            script(src=`http://static.${ctx.Domain}/js/main.js`)
+        else
+            link(rel='stylesheet' href=`https://static.${ctx.Domain}/css/mnf-style.css`)
+            script(src=`https://static.${ctx.Domain}/js/mnf-main.js`)
+        title #{ctx.TabTitle}
+
+mixin inputToken()
+    label #{i18n.View.Mixin.Label.InputToken}
+        input(name='token'
+            type='text'
+            validation-0='validateInitToken'
+            advice-0=`${i18n.View.Mixin.Advice.ValidateInitToken("<pre>./app/init-token</pre>")}`)
+        div(class='advice-group')
+
+mixin inputFirstname()
+    label #{i18n.View.Mixin.Label.InputFirstname}
+        input(name='firstname'
+            type='text'
+            autocomplete='given-name'
+            placeholder='ex : Jean'
+            validation-0='notEmpty'
+            advice-0=`${i18n.View.Mixin.Advice.NotEmpty()}`)
+        div(class='advice-group')
+
+mixin inputLastname()
+    label #{i18n.View.Mixin.Label.InputLastname}
+        input(name='firstname'
+            type='text'
+            autocomplete='family-name'
+            placeholder='ex : Dupont'
+            validation-0='notEmpty'
+            advice-0=`${i18n.View.Mixin.Advice.NotEmpty()}`)
+        div(class='advice-group')
+
+mixin inputEmail()
+    label #{i18n.View.Mixin.Label.InputEmail()}
+        input(name='email'
+            type='email'
+            autocomplete='email'
+            placeholder='ex : jean.dupont@gmail.com'
+            validation-0='validateEmail'
+            advice-0=`${i18n.View.Mixin.Advice.ValidateEmail()}`)
+        div(class='advice-group')
+
+mixin inputNewPassword()
+    label #{i18n.View.Mixin.Label.InputNewPassword()}
+        input(name='password'
+            type='password'
+            autocomplete='new-password'
+            validation-0='atLeastUpper'
+            validation-1='atLeastLower'
+            validation-2='atLeastNumber'
+            validation-3='atLeastSpecialChar'
+            validation-4='atLeast8Char'
+            advice-0=`${i18n.View.Mixin.Advice.AtLeastUpper()}`
+            advice-1=`${i18n.View.Mixin.Advice.AtLeastLower()}`
+            advice-2=`${i18n.View.Mixin.Advice.AtLeastNumber()}`
+            advice-3=`${i18n.View.Mixin.Advice.AtLeastSpecialChar()}`
+            advice-4=`${i18n.View.Mixin.Advice.AtLeast8Char()}`)
+        div(class='advice-group')
+
+mixin inputRepeatPassword()
+    label #{i18n.View.Mixin.Label.InputRepeatPassword()}
+        input(name='password'
+            type='password'
+            autocomplete='new-password'
+            validation-0='sameAsPrevious'
+            advice-0=`${i18n.View.Mixin.Advice.SameAsPrevious()}`)
+        div(class='advice-group')
+
+mixin inputRequestPassword()
+    label #{i18n.View.Mixin.Label.InputRequestPassword()}
+        input(name='password'
+            type='password'
+            autocomplete='current-password'
+            validation-0='atLeast8Char'
+            advice-0=`${i18n.View.Mixin.Advice.AtLeast8Char()}`)
+        div(class='advice-group')

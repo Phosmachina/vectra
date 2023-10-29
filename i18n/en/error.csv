@@ -1,9 +1,0 @@
-NotFirstLaunch,This is not the first launch: application is already initialised.
-InvalidToken,The initialisation token is incorrect.
-Unauthorised,The user is not authorized to access this resource.
-UserExist,The user already exist.
-UserDisabled,The user is disabled.
-InvalidUserRef,The user's id does not exist.
-InvalidRequestStructure,The structure's data is invalid.
-InvalidDataStructure,The structure's data is invalid.
-InsufficientRoleLevel,The current role have no sufficient privilege.

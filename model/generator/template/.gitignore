@@ -1,0 +1,9 @@
+.idea
+
+/data/bin/
+/data/db/
+/data/config/init-token
+
+/static/js/mnf-*
+/static/css/*css*
+/static/css/.sass-cache/

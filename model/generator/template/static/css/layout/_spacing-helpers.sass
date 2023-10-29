@@ -1,0 +1,70 @@
+// Define margin and padding values
+$spacing-values: (0: 0, 1: 0.25rem, 2: 0.5rem, 3: 0.75rem, 4: 1rem, 5: 1.25rem, 6: 1.5rem, 8: 2rem, 10: 2.5rem, 12: 3rem, 16: 4rem, 20: 5rem, 24: 6rem)
+
+//$spacing-values: (
+//0: 0,
+//1: 0.25rem,
+//2: 0.5rem,
+//3: 0.75rem,
+//4: 1rem,
+//5: 1.25rem,
+//6: 1.5rem,
+//8: 2rem,
+//10: 2.5rem,
+//12: 3rem,
+//16: 4rem,
+//20: 5rem,
+//24: 6rem,
+//)
+
+// Margin classes
+@mixin margin-helpers
+    @each $size, $value in $spacing-values
+        .m-#{$size} 
+            margin: $value
+
+        .mt-#{$size}
+            margin-top: $value
+
+        .mb-#{$size}
+            margin-bottom: $value
+
+        .ml-#{$size}
+            margin-left: $value
+
+        .mr-#{$size}
+            margin-right: $value
+
+        .mx-#{$size}
+            margin-left: $value
+            margin-right: $value
+
+        .my-#{$size}
+            margin-top: $value
+            margin-bottom: $value
+
+// Padding classes
+@mixin padding-helpers
+    @each $size, $value in $spacing-values
+        .p-#{$size}
+            padding: $value
+
+        .pt-#{$size}
+            padding-top: $value
+
+        .pb-#{$size}
+            padding-bottom: $value
+
+        .pl-#{$size}
+            padding-left: $value
+
+        .pr-#{$size}
+            padding-right: $value
+
+        .px-#{$size}
+            padding-left: $value
+            padding-right: $value
+
+        .py-#{$size}
+            padding-top: $value
+            padding-bottom: $value
