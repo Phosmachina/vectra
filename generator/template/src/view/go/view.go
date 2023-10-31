@@ -1,4 +1,4 @@
-package view
+package _go
 
 import (
 	. "Vectra/src/model/service"

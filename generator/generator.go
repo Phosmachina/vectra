@@ -38,10 +38,10 @@ const (
 	Skeleton             // Body functions to be filled later
 )
 
-type Report[T any] struct {
-	Files   []SourceFile `yaml:"files"`
-	Config  T            `yaml:"config"`
-	Version int8         `yaml:"version"`
+type Report struct {
+	Files   []SourceFile   `yaml:"files"`
+	Config  map[string]any `yaml:"config"`
+	Version int8           `yaml:"version"`
 }
 
 type SourceFile struct {
@@ -70,24 +70,31 @@ type IGenerator interface {
 	PrintReport()
 }
 
-type Generator[T any] struct {
+type Generator struct {
 	Name        string
 	projectPath string
 
-	lastReport Report[T]
-	nextReport Report[T]
+	vectra          *Vectra
+	configSelectors []string
+	lastReport      Report
+	nextReport      Report
 }
 
-func NewAbstractGenerator[T any](
+func NewAbstractGenerator(
 	name string,
-	report Report[T],
-	projectPath string,
-) *Generator[T] {
+	configSelectors []string,
+	report Report,
+	vectra *Vectra,
+) *Generator {
 
-	generator := Generator[T]{
-		Name:        name,
-		projectPath: projectPath,
-		nextReport:  report,
+	report.Config = vectra.GetFieldsAsMap(configSelectors)
+
+	generator := Generator{
+		Name:            name,
+		vectra:          vectra,
+		configSelectors: configSelectors,
+		projectPath:     vectra.ProjectPath,
+		nextReport:      report,
 	}
 
 	generator.init()
@@ -95,14 +102,14 @@ func NewAbstractGenerator[T any](
 	return &generator
 }
 
-func (g *Generator[T]) init() {
+func (g *Generator) init() {
 	data, err := os.ReadFile(filepath.Join(
 		g.projectPath,
 		FolderProject,
 		g.Name+"_report.yml",
 	))
 	if err != nil {
-		g.lastReport = Report[T]{}
+		g.lastReport = Report{}
 		return
 	}
 	if err := yaml.Unmarshal(data, &g.lastReport); err != nil {
@@ -110,7 +117,7 @@ func (g *Generator[T]) init() {
 	}
 }
 
-func (g *Generator[T]) Generate(data any) {
+func (g *Generator) Generate(data any) {
 
 	for _, file := range g.nextReport.Files {
 
@@ -170,7 +177,7 @@ func (g *Generator[T]) Generate(data any) {
 	g.updateReport()
 }
 
-func (g *Generator[T]) updateReport() {
+func (g *Generator) updateReport() {
 
 	for i, file := range g.nextReport.Files {
 		hash, err := calculateHash(filepath.Join(g.projectPath, file.RealPath))
@@ -199,7 +206,7 @@ func (g *Generator[T]) updateReport() {
 	}
 }
 
-func (g *Generator[T]) PrintReport() {
+func (g *Generator) PrintReport() {
 
 	fmt.Printf("======= %s generator report (v%d) =======\n", g.Name, g.nextReport.Version)
 
@@ -240,11 +247,11 @@ func (g *Generator[T]) PrintReport() {
 
 }
 
-func (g *Generator[T]) isUpToDate() bool {
+func (g *Generator) isUpToDate() bool {
 	return g.lastReport.Version == g.nextReport.Version
 }
 
-func (g *Generator[T]) isWaitingForGeneration() bool {
+func (g *Generator) isWaitingForGeneration() bool {
 	return !reflect.DeepEqual(g.nextReport.Config, g.lastReport.Config)
 }
 

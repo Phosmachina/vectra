@@ -8,36 +8,37 @@ import (
 	"text/template"
 )
 
-type I18nConfig struct {
-	DefaultLang string `yaml:"default_lang"`
-}
-
 type I18n struct {
-	Generator[*I18nConfig]
+	Generator
 	dic map[string]string
 }
 
-func NewI18n(projectPath string, cfg *I18nConfig) *I18n {
+func NewI18n(cfg *Vectra) *I18n {
 
-	config := cfg
-	generator := NewAbstractGenerator[*I18nConfig]("i18n", Report[*I18nConfig]{
-		Files: []SourceFile{
-			NewSourceFile("src/model/i18n/i18n_gen.go.tmpl", Static),
-			NewSourceFile("src/view/go/view_gen.go.tmpl", Static),
+	generator := NewAbstractGenerator(
+		"i18n",
+		[]string{
+			"DefaultLang",
 		},
-		Config:  config,
-		Version: 1,
-	}, projectPath)
+		Report{
+			Files: []SourceFile{
+				NewSourceFile("src/model/i18n/i18n_gen.go.tmpl", Static),
+				NewSourceFile("src/view/go/view_gen.go.tmpl", Static),
+			},
+			Version: 1,
+		}, cfg,
+	)
 	n := I18n{}
 	n.Generator = *generator
-
-	n.dic = make(map[string]string)
 
 	return &n
 }
 
 func (i *I18n) Generate() {
-	path := filepath.Join(i.projectPath, i.nextReport.Config.DefaultLang)
+
+	i.dic = make(map[string]string)
+
+	path := filepath.Join(i.projectPath, i.vectra.DefaultLang)
 	_ = i.loadData(path, "")
 
 	var root = newFolder("", nil)

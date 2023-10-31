@@ -1,7 +1,7 @@
 package main
 
 import (
-	"Vectra/model"
+	"Vectra/generator"
 	"github.com/urfave/cli"
 	"log"
 	"os"
@@ -9,7 +9,7 @@ import (
 
 func main() {
 
-	var vectra *model.Vectra
+	var vectra *generator.Vectra
 
 	app := cli.NewApp()
 	app.Name = "vectra"
@@ -20,7 +20,7 @@ func main() {
 
 	app.Before = func(c *cli.Context) error {
 		path := c.String("path")
-		vectra = model.NewVectra(path)
+		vectra = generator.NewVectra(path)
 		return nil
 	}
 

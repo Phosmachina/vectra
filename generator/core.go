@@ -1,19 +1,17 @@
 package generator
 
-type CoreConfig struct {
-	DefaultLang string `yaml:"default_lang"`
-}
-
 type Core struct {
-	Generator[*CoreConfig]
+	Generator
 }
 
-func NewCore(projectPath string, cfg *CoreConfig) *Core {
+func NewCore(cfg *Vectra) *Core {
 
-	config := cfg
 	generator := NewAbstractGenerator(
 		"core",
-		Report[*CoreConfig]{
+		[]string{
+			"DefaultLang",
+		},
+		Report{
 			Files: []SourceFile{
 				NewSourceFile("app.go", Critical),
 				NewDynSourceFile("go.mod.embed", "go.mod", Critical),
@@ -25,9 +23,9 @@ func NewCore(projectPath string, cfg *CoreConfig) *Core {
 				NewSourceFile("src/controller/controller.go", Critical),
 				NewSourceFile("src/view/go/view.go", Critical),
 			},
-			Config:  config,
 			Version: 1,
-		}, projectPath)
+		}, cfg,
+	)
 	n := Core{}
 	n.Generator = *generator
 
