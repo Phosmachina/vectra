@@ -13,7 +13,12 @@ html{
 
 </style>
 
-<img src="docs/vectra_banner.svg" alt="Banner" style="width: 100%;padding: 3rem">
+[//]: # (<img src="docs/vectra_banner.svg" alt="Banner" style="width: 100%;padding: 3rem">)
+
+<img src="docs/test.svg" width="100%" alt="test">
+
+[//]: # (<img src="docs/overview.svg" width="100%" alt="Click to see the source">)
+
 
 <div style="display: flex; justify-content: center">
 <details>
@@ -23,11 +28,11 @@ html{
 
 <!-- TOC -->
 
-* [🎯 Overview](#-overview)
-* [⚡️ Features](#-features)
-* [🚀 Getting started](#-getting-started)
-* [🤝 Contributing](#-contributing)
-* [🕘 What's next](#-whats-next)
+- [🎯 Overview](#-overview)
+- [⚡️ Features](#️-features)
+- [🚀 Getting started](#-getting-started)
+- [🤝 Contributing](#-contributing)
+- [🕘 What's next](#-whats-next)
 
 <!-- TOC -->
 
