@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"text/template"
 )
 
 type I18n struct {
@@ -22,8 +21,9 @@ func NewI18n(cfg *Vectra) *I18n {
 		},
 		Report{
 			Files: []SourceFile{
-				NewSourceFile("src/model/i18n/i18n_gen.go.tmpl", Static),
-				NewSourceFile("src/view/go/view_gen.go.tmpl", Static),
+				NewSourceFile("src/model/i18n/i18n_gen.go.tmpl", FullGen),
+				NewSourceFile("src/view/pug/shared/i18n_completion_variables.pug.tmpl",
+					FullGen),
 			},
 			Version: 1,
 		}, cfg,
@@ -38,7 +38,7 @@ func (i *I18n) Generate() {
 
 	i.dic = make(map[string]string)
 
-	path := filepath.Join(i.projectPath, i.vectra.DefaultLang)
+	path := filepath.Join(i.projectPath, "data", "i18n", i.vectra.DefaultLang)
 	_ = i.loadData(path, "")
 
 	var root = newFolder("", nil)
@@ -47,17 +47,21 @@ func (i *I18n) Generate() {
 		root.add(strings.Split(k, "."))
 	}
 
-	//i.Generator.Generate()
-
 	types := buildDataTemplate(root)
-	err := generateGoCodeToFile(TemplateData{Types: types})
-	if err != nil {
-		// TODO print error
-	}
-	err = generatePugCodeToFile(root)
-	if err != nil {
-		// TODO print error
-	}
+
+	i.Generator.Generate(map[string]any{
+		"i18n_gen":                  TemplateData{Types: types},
+		"i18n_completion_variables": root,
+	})
+
+	//err := generateGoCodeToFile(TemplateData{Types: types})
+	//if err != nil {
+	//	// TODO print error
+	//}
+	//err = generatePugCodeToFile(root)
+	//if err != nil {
+	//	// TODO print error
+	//}
 }
 
 type TemplateData struct {
@@ -141,67 +145,6 @@ func (f *Folder) add(keys []string) {
 		}
 		f.Items[keys[0]].add(keys[1:])
 	}
-}
-
-func generateGoCodeToFile(data TemplateData) error {
-
-	file, _ := os.ReadFile("template/i18n/Go.tmpl")
-	tmpl := string(file)
-
-	outputFile, err := os.Create("gen/i18n_gen.go")
-	if err != nil {
-		return err
-	}
-	defer outputFile.Close()
-
-	// Parse and execute the template
-	tmplParsed, err := template.New("i18n_tmpl").Funcs(
-		template.FuncMap{"Upper": Upper},
-	).Funcs(
-		template.FuncMap{"OnlyPrefix": OnlyPrefix},
-	).Funcs(
-		template.FuncMap{"IsNotPlural": IsNotPlural},
-	).Parse(tmpl)
-	if err != nil {
-		return err
-	}
-
-	err = tmplParsed.Execute(outputFile, data)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func generatePugCodeToFile(data *Folder) error {
-
-	file, _ := os.ReadFile("template/i18n/Pug.tmpl")
-	tmpl := string(file)
-
-	outputFile, err := os.Create("gen/i18n_gen.pug")
-	if err != nil {
-		return err
-	}
-	defer outputFile.Close()
-
-	tmplParsed, err := template.New("i18n_tmpl").Funcs(
-		template.FuncMap{"Upper": Upper},
-	).Funcs(
-		template.FuncMap{"OnlyPrefix": OnlyPrefix},
-	).Funcs(
-		template.FuncMap{"IsNotPlural": IsNotPlural},
-	).Parse(tmpl)
-	if err != nil {
-		return err
-	}
-
-	err = tmplParsed.Execute(outputFile, data)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func buildDataTemplate(root *Folder) []I18nType {

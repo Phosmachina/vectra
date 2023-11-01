@@ -17,7 +17,7 @@ import (
 )
 
 var (
-	//go:embed template
+	//go:embed all:template
 	EmbedFS embed.FS
 
 	FolderProject  = ".vectra"
@@ -32,10 +32,10 @@ const (
 )
 
 const (
-	Copy     = 1 << iota // For demo purpose or something like that
-	Critical             // For core of Vectra edit with caution
-	Static               // Don't be edited at all
-	Skeleton             // Body functions to be filled later
+	Copy     = 1 << iota // For demo purpose or something like that.
+	CorePart             // For the core of Vectra edit with caution.
+	FullGen              // Don't be edited at all.
+	Skeleton             // Body functions to be filled later.
 )
 
 type Report struct {
@@ -231,8 +231,6 @@ func (g *Generator) PrintReport() {
 		)
 	}
 
-	fmt.Println()
-
 	for i, file := range g.lastReport.Files {
 		hash, err := calculateHash(filepath.Join(g.projectPath, file.RealPath))
 		if err != nil {
@@ -264,9 +262,9 @@ func printLogPrefix(kind int8, fileKind int8) {
 		switch fileKind {
 		case Copy:
 			s = "💡 [SAME]"
-		case Critical:
+		case CorePart:
 			fallthrough
-		case Static:
+		case FullGen:
 			s = "✅️ [SAME]"
 		case Skeleton:
 			s = "⚠️ [SAME]"
@@ -275,18 +273,18 @@ func printLogPrefix(kind int8, fileKind int8) {
 		switch fileKind {
 		case Copy:
 			s = "💡 [DELETED]"
-		case Critical:
+		case CorePart:
 			fallthrough
-		case Static:
+		case FullGen:
 			fallthrough
 		case Skeleton:
 			s = "❌️ [DELETED]"
 		}
 	case Edited:
 		switch fileKind {
-		case Critical:
+		case CorePart:
 			s = "⚠️ [EDITED]"
-		case Static:
+		case FullGen:
 			s = "❌️ [EDITED]"
 		case Copy:
 			fallthrough
@@ -332,16 +330,33 @@ func OnlyPrefix(str string) string {
 
 //region File helpers
 
-func calculateHash(filePath string) (string, error) {
-	data, err := os.ReadFile(filePath)
+func calculateHash(path string) (string, error) {
+	m := md5.New()
+
+	err := filepath.WalkDir(path, func(filePath string, fileInfo os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// Skip directories
+		if fileInfo.IsDir() {
+			return nil
+		}
+
+		fileData, err := os.ReadFile(filePath)
+		if err != nil {
+			return err
+		}
+
+		m.Write(fileData)
+		return nil
+	})
+
 	if err != nil {
 		return "", err
 	}
 
-	m := md5.New()
-	m.Write(data)
 	hash := hex.EncodeToString(m.Sum(nil))
-
 	return hash, nil
 }
 

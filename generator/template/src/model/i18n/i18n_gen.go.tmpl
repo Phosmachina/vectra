@@ -2,6 +2,8 @@
 
 package i18n
 
+{{- with .i18n_gen }}
+
 type (
     i18nFunc func(...interface{}) string
 {{ range .Types }}
@@ -14,14 +16,17 @@ type (
 var ({{ range .Types }}
 	{{ .Name | Upper }} = {{ .Name }}Type{ {{ range .Fields }}
 		{{- if .Name | IsNotPlural -}}
-			{{ .Name | OnlyPrefix | Upper }}: {{ if .IsDirectory }}{{ .Name | Upper }}, {{ else }}
+			{{ .Name | OnlyPrefix | Upper }}: {{ if .IsDirectory }}{{ .Name | Upper }},
+			{{- else -}}
 			func(args ...interface{}) string {
 				return call("{{ .Key | OnlyPrefix }}", args...)
-			},{{ end }} {{- end -}}
-		{{- end -}}
+			},{{ end }} {{ end }}
+		{{ end -}}
 		}
 {{- end -}}
 )
+
+{{ end -}}
 
 func call(key string, args ...interface{}) string {
 	return GetInstance().Get(key, args...)

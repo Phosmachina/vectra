@@ -12,7 +12,6 @@ import (
 
 var (
 	defaultVectra = Vectra{
-		generators:  nil,
 		DefaultLang: "en",
 	}
 )
@@ -21,22 +20,18 @@ type Vectra struct {
 	generators  map[string]IGenerator `yaml:"-"`
 	ProjectPath string                `yaml:"-"`
 
-	DefaultLang string `yaml:"default_lang"`
-
-	DevPort          int    `yaml:"dev_port"`
-	ProductionPort   int    `yaml:"production_port"`
-	ProductionDomain string `yaml:"production_domain"`
-
-	WithGitignore     bool `yaml:"with_gitignore"`
-	WithDockerfile    bool `yaml:"with_dockerfile"`
-	WithDockerCompose bool `yaml:"with_docker_compose"`
-
-	WithI18nExample bool `yaml:"with_i18n_example"`
-	WithSassExample bool `yaml:"with_sass_example"`
-	WithPugExample  bool `yaml:"with_pug_example"`
-
-	WithIdeaConfig bool `yaml:"with_idea_config"`
-	WithDockerPipe bool `yaml:"with_docker_pipe"`
+	DefaultLang       string `yaml:"default_lang"`
+	DevPort           int    `yaml:"dev_port"`
+	ProductionPort    int    `yaml:"production_port"`
+	ProductionDomain  string `yaml:"production_domain"`
+	WithGitignore     bool   `yaml:"with_gitignore"`
+	WithDockerfile    bool   `yaml:"with_dockerfile"`
+	WithDockerCompose bool   `yaml:"with_docker_compose"`
+	WithI18nExample   bool   `yaml:"with_i18n_example"`
+	WithSassExample   bool   `yaml:"with_sass_example"`
+	WithPugExample    bool   `yaml:"with_pug_example"`
+	WithIdeaConfig    bool   `yaml:"with_idea_config"`
+	WithDockerPipe    bool   `yaml:"with_docker_pipe"`
 }
 
 func NewVectra(projectPath string) *Vectra {
@@ -57,9 +52,11 @@ func NewVectra(projectPath string) *Vectra {
 
 	core := NewCore(&vectra)
 	i18n := NewI18n(&vectra)
+	static := NewStatic(&vectra)
 	generators := map[string]IGenerator{
-		core.Name: core,
-		i18n.Name: i18n,
+		core.Name:   core,
+		i18n.Name:   i18n,
+		static.Name: static,
 	}
 	vectra.generators = generators
 

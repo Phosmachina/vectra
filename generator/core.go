@@ -13,15 +13,15 @@ func NewCore(cfg *Vectra) *Core {
 		},
 		Report{
 			Files: []SourceFile{
-				NewSourceFile("app.go", Critical),
-				NewDynSourceFile("go.mod.embed", "go.mod", Critical),
-				NewDynSourceFile("go.sum.embed", "go.sum", Critical),
-				NewSourceFile("src/model/i18n/i18n.go", Critical),
-				NewSourceFile("src/model/service/service.go", Critical),
-				NewSourceFile("src/model/storage/storage.go", Critical),
-				NewSourceFile("src/model/helpers.go", Critical),
-				NewSourceFile("src/controller/controller.go", Critical),
-				NewSourceFile("src/view/go/view.go", Critical),
+				NewSourceFile("app.go", CorePart),
+				NewDynSourceFile("go.mod.embed", "go.mod", CorePart),
+				NewDynSourceFile("go.sum.embed", "go.sum", CorePart),
+				NewSourceFile("src/model/i18n/i18n.go", CorePart),
+				NewSourceFile("src/model/service/service.go", CorePart),
+				NewSourceFile("src/model/storage/storage.go", CorePart),
+				NewSourceFile("src/model/helpers.go", CorePart),
+				NewSourceFile("src/controller/controller.go", CorePart),
+				NewSourceFile("src/view/go/view.go", CorePart),
 			},
 			Version: 1,
 		}, cfg,
@@ -33,5 +33,5 @@ func NewCore(cfg *Vectra) *Core {
 }
 
 func (i *Core) Generate() {
-	i.Generator.Generate(i.nextReport.Config)
+	i.Generator.Generate(nil)
 }

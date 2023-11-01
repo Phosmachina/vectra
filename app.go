@@ -57,7 +57,7 @@ func main() {
 					Name:  "i18n",
 					Usage: "Generate the i18n part of the Vectra project",
 					Action: func(c *cli.Context) error {
-						log.Println("Generating i18n template")
+						log.Println("Generating i18n template.")
 						vectra.Generate("i18n")
 						return nil
 					},
@@ -66,7 +66,7 @@ func main() {
 					Name:  "service",
 					Usage: "Generate services part of the Vectra project",
 					Action: func(c *cli.Context) error {
-						log.Println("Generating model template")
+						log.Println("Generating model template.")
 						//vectra.Generate("model")
 						// Add model generation logic here
 						return nil
@@ -76,7 +76,7 @@ func main() {
 					Name:  "controller",
 					Usage: "Generate controllers part of the Vectra project",
 					Action: func(c *cli.Context) error {
-						log.Println("Generating controller template")
+						log.Println("Generating controller template.")
 						vectra.Generate("controller")
 						return nil
 					},
@@ -85,8 +85,17 @@ func main() {
 					Name:  "core",
 					Usage: "Generate core part of the Vectra project",
 					Action: func(c *cli.Context) error {
-						log.Println("Copy core parts following configuration")
+						log.Println("Copy core parts following configuration.")
 						vectra.Generate("core")
+						return nil
+					},
+				},
+				{
+					Name:  "static",
+					Usage: "Generate static part of the Vectra project",
+					Action: func(c *cli.Context) error {
+						log.Println("Copy static parts following configuration.")
+						vectra.Generate("static")
 						return nil
 					},
 				},

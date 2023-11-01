@@ -15,9 +15,12 @@
     {{- end -}}
 {{- end -}}
 
+{{ with .i18n_completion_variables -}}
+
 -
     var i18n = {
         {{- range $key, $value := .Items -}}
             {{- template "folder" $value -}}
         {{- end -}}
     }
+{{- end -}}
