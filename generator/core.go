@@ -1,10 +1,10 @@
 package generator
 
 type Core struct {
-	Generator
+	*Generator
 }
 
-func NewCore(cfg *Vectra) *Core {
+func NewCore(cfg *Vectra) *Generator {
 
 	generator := NewAbstractGenerator(
 		"core",
@@ -21,15 +21,15 @@ func NewCore(cfg *Vectra) *Core {
 				NewSourceFile("src/model/storage/storage.go", CorePart),
 				NewSourceFile("src/model/helpers.go", CorePart),
 				NewSourceFile("src/controller/controller.go", CorePart),
-				NewSourceFile("src/view/go/view.go", CorePart),
 			},
 			Version: 1,
-		}, cfg,
-	)
-	n := Core{}
-	n.Generator = *generator
+		}, cfg)
 
-	return &n
+	n := &Core{}
+	n.Generator = generator
+	n.IGenerator = n
+
+	return generator
 }
 
 func (i *Core) Generate() {

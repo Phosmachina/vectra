@@ -8,11 +8,11 @@ import (
 )
 
 type I18n struct {
-	Generator
+	*Generator
 	dic map[string]string
 }
 
-func NewI18n(cfg *Vectra) *I18n {
+func NewI18n(cfg *Vectra) *Generator {
 
 	generator := NewAbstractGenerator(
 		"i18n",
@@ -26,12 +26,13 @@ func NewI18n(cfg *Vectra) *I18n {
 					FullGen),
 			},
 			Version: 1,
-		}, cfg,
-	)
-	n := I18n{}
-	n.Generator = *generator
+		}, cfg)
 
-	return &n
+	n := &I18n{}
+	n.Generator = generator
+	n.IGenerator = n
+
+	return generator
 }
 
 func (i *I18n) Generate() {
@@ -53,15 +54,6 @@ func (i *I18n) Generate() {
 		"i18n_gen":                  TemplateData{Types: types},
 		"i18n_completion_variables": root,
 	})
-
-	//err := generateGoCodeToFile(TemplateData{Types: types})
-	//if err != nil {
-	//	// TODO print error
-	//}
-	//err = generatePugCodeToFile(root)
-	//if err != nil {
-	//	// TODO print error
-	//}
 }
 
 type TemplateData struct {

@@ -1,10 +1,10 @@
 package generator
 
 type Static struct {
-	Generator
+	*Generator
 }
 
-func NewStatic(cfg *Vectra) *Static {
+func NewStatic(cfg *Vectra) *Generator {
 
 	files := []SourceFile{
 		NewSourceFile("static/favicon.ico", Skeleton),
@@ -16,6 +16,13 @@ func NewStatic(cfg *Vectra) *Static {
 	if cfg.WithI18nExample {
 		files = append(files, NewSourceFile("data/i18n/", Copy))
 	}
+	if cfg.WithPugExample {
+		files = append(files, NewSourceFile("view/pug/shared/layout.pug", Copy))
+		files = append(files, NewSourceFile("view/pug/shared/mixins.pug", Copy))
+		files = append(files, NewSourceFile("view/pug/index.pug", Skeleton))
+		files = append(files, NewSourceFile("view/pug/init.pug", Copy))
+		files = append(files, NewSourceFile("view/pug/login.pug", Copy))
+	}
 	if cfg.WithGitignore {
 		files = append(files, NewSourceFile(".gitignore", Copy))
 	}
@@ -25,17 +32,19 @@ func NewStatic(cfg *Vectra) *Static {
 		[]string{
 			"WithSassExample",
 			"WithI18nExample",
+			"WithPugExample",
 			"WithGitignore",
 		},
 		Report{
 			Files:   files,
 			Version: 1,
-		}, cfg,
-	)
-	n := Static{}
-	n.Generator = *generator
+		}, cfg)
 
-	return &n
+	n := &Static{}
+	n.Generator = generator
+	n.IGenerator = n
+
+	return generator
 }
 
 func (i *Static) Generate() {

@@ -9,17 +9,17 @@ type (
 {{ range .Types }}
 	{{ .Name }}Type struct { {{ range .Fields }} {{ if .IsDirectory }}
 		{{ .Name | Upper }} {{ .Name }}Type {{ else if .Name | IsNotPlural }}
-		{{ .Name | OnlyPrefix | Upper }} i18nFunc {{ end }} {{ end }}
+		{{ .Name | TrimPluralization | Upper }} i18nFunc {{ end }} {{ end }}
 	}
 {{ end }})
 
 var ({{ range .Types }}
 	{{ .Name | Upper }} = {{ .Name }}Type{ {{ range .Fields }}
 		{{- if .Name | IsNotPlural -}}
-			{{ .Name | OnlyPrefix | Upper }}: {{ if .IsDirectory }}{{ .Name | Upper }},
+			{{ .Name | TrimPluralization | Upper }}: {{ if .IsDirectory }}{{ .Name | Upper }},
 			{{- else -}}
 			func(args ...interface{}) string {
-				return call("{{ .Key | OnlyPrefix }}", args...)
+				return call("{{ .Key | TrimPluralization }}", args...)
 			},{{ end }} {{ end }}
 		{{ end -}}
 		}

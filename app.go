@@ -99,6 +99,15 @@ func main() {
 						return nil
 					},
 				},
+				{
+					Name:  "types",
+					Usage: "Generate types part of the Vectra project",
+					Action: func(c *cli.Context) error {
+						log.Println("Generate types parts following configuration.")
+						vectra.Generate("types")
+						return nil
+					},
+				},
 				// Add more subcommands as needed
 			},
 		},

@@ -1,4 +1,4 @@
-package _go
+package view
 
 import (
 	. "Vectra/src/model/service"
@@ -6,17 +6,27 @@ import (
 	. "github.com/phosmachina/FluentKV/reldb"
 )
 
-type GlobalCtx struct {
-	IsDev    bool
-	Domain   string
-	TabTitle string
-	Lang     string
+{{ with .ViewTypes }}
 
-	User UserCtx
+	{{- $bodies := .Bodies -}}
+
+	{{- range .Types }}
+type {{ .Name }} struct {
+{{- range .Attributes }}
+	{{ .Name }} {{ .Type }}
+{{- end }}
 }
+	{{ end -}}
 
-func NewGlobalCtx(tabSuffix string, userId string) GlobalCtx {
+	{{ range .Constructors }}
 
+func {{ .Name }} (
+{{- range .Attributes }} {{- .Name }} {{ .Type }}, {{ end -}}
+) {{ .Name | TrimNewPrefix }} {
+{{- if KeyExist .Name $bodies }}
+{{ index $bodies .Name -}}
+{{ else }}
+	{{- if eq "NewGlobalCtx" .Name }}
 	config := GetApiV1().GetStore().Config
 
 	ctx := GlobalCtx{
@@ -33,19 +43,7 @@ func NewGlobalCtx(tabSuffix string, userId string) GlobalCtx {
 	}
 
 	return ctx
-}
-
-type UserCtx struct {
-	ID          string
-	Role        Role
-	IsActivated bool
-	Firstname   string
-	Lastname    string
-	Email       string
-}
-
-func newUserCtx(userId string) UserCtx {
-
+{{ else if eq "newUserCtx" .Name }}
 	if userId == "" {
 		return UserCtx{}
 	}
@@ -63,4 +61,11 @@ func newUserCtx(userId string) UserCtx {
 		Lastname:    user.Lastname,
 		Email:       user.Email,
 	}
+{{ end -}}
+{{ end -}}
 }
+
+	{{- end -}}
+
+
+{{ end }}

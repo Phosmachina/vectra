@@ -12,7 +12,89 @@ import (
 
 var (
 	defaultVectra = Vectra{
-		DefaultLang: "en",
+		DefaultLang:       "en",
+		DevPort:           8080,
+		ProductionPort:    8100,
+		WithGitignore:     true,
+		WithDockerfile:    true,
+		WithDockerCompose: true,
+		WithI18nExample:   true,
+		WithSassExample:   true,
+		WithPugExample:    true,
+		WithIdeaConfig:    true,
+		WithDockerPipe:    true,
+		StorageTypes: []VectraType[SimpleAttribute]{
+			{Name: "DemoStorageType", Attributes: []SimpleAttribute{
+				{Name: "Field1", Type: "bool"},
+				{Name: "Field2", Type: "[]string"},
+			}},
+		},
+		ExchangeTypes: []VectraType[AttributeWithTag]{
+			{Name: "DemoExchangeType", Attributes: []AttributeWithTag{
+				{
+					SimpleAttribute: SimpleAttribute{Name: "Name", Type: "string"},
+					ModTag:          "trim,camel",
+					ValidatorTag:    "required",
+				},
+			}},
+		},
+		ViewTypes: ViewTypes{
+			Types: []VectraType[SimpleAttribute]{
+				{Name: "GlobalCtx", Attributes: []SimpleAttribute{
+					{Name: "IsDev", Type: "bool"},
+					{Name: "Domain", Type: "string"},
+					{Name: "TabTitle", Type: "string"},
+					{Name: "Lang", Type: "string"},
+				}},
+				{Name: "UserCtx", Attributes: []SimpleAttribute{
+					{Name: "ID", Type: "string"},
+					{Name: "Role", Type: "Role"},
+					{Name: "IsActivated", Type: "bool"},
+					{Name: "Firstname", Type: "string"},
+					{Name: "Lastname", Type: "string"},
+					{Name: "Email", Type: "string"},
+				}},
+			},
+			Constructors: []VectraType[SimpleAttribute]{
+				{Name: "NewGlobalCtx", Attributes: []SimpleAttribute{
+					{Name: "tabSuffix", Type: "string"},
+					{Name: "userId", Type: "string"},
+				}},
+				{Name: "newUserCtx", Attributes: []SimpleAttribute{
+					{Name: "userId", Type: "string"},
+				}},
+			},
+		},
+
+		Controllers: []Controller{
+			{
+				IsView: true,
+				Routes: []Route{
+					{
+						Kind:   "Get",
+						Path:   "/index",
+						Target: "Index",
+					},
+				},
+			},
+		},
+		Services: []Service{
+			{
+				Name: "ApiV2",
+				Errors: []string{
+					"ErrorInvalidUserId",
+				},
+				Methods: []Method{
+					{
+						Name: "RemoveUser",
+						Inputs: []SimpleAttribute{
+							{Name: "Id", Type: "string"},
+						},
+						Outputs: []string{"error"},
+					},
+				},
+			},
+		},
 	}
 )
 
@@ -20,18 +102,23 @@ type Vectra struct {
 	generators  map[string]IGenerator `yaml:"-"`
 	ProjectPath string                `yaml:"-"`
 
-	DefaultLang       string `yaml:"default_lang"`
-	DevPort           int    `yaml:"dev_port"`
-	ProductionPort    int    `yaml:"production_port"`
-	ProductionDomain  string `yaml:"production_domain"`
-	WithGitignore     bool   `yaml:"with_gitignore"`
-	WithDockerfile    bool   `yaml:"with_dockerfile"`
-	WithDockerCompose bool   `yaml:"with_docker_compose"`
-	WithI18nExample   bool   `yaml:"with_i18n_example"`
-	WithSassExample   bool   `yaml:"with_sass_example"`
-	WithPugExample    bool   `yaml:"with_pug_example"`
-	WithIdeaConfig    bool   `yaml:"with_idea_config"`
-	WithDockerPipe    bool   `yaml:"with_docker_pipe"`
+	DefaultLang       string                         `yaml:"default_lang"`
+	DevPort           int                            `yaml:"dev_port"`
+	ProductionPort    int                            `yaml:"production_port"`
+	ProductionDomain  string                         `yaml:"production_domain"`
+	WithGitignore     bool                           `yaml:"with_gitignore"`
+	WithDockerfile    bool                           `yaml:"with_dockerfile"`
+	WithDockerCompose bool                           `yaml:"with_docker_compose"`
+	WithI18nExample   bool                           `yaml:"with_i18n_example"`
+	WithSassExample   bool                           `yaml:"with_sass_example"`
+	WithPugExample    bool                           `yaml:"with_pug_example"`
+	WithIdeaConfig    bool                           `yaml:"with_idea_config"`
+	WithDockerPipe    bool                           `yaml:"with_docker_pipe"`
+	StorageTypes      []VectraType[SimpleAttribute]  `yaml:"storage_types"`
+	ExchangeTypes     []VectraType[AttributeWithTag] `yaml:"exchange_types"`
+	ViewTypes         ViewTypes                      `yaml:"view_types"`
+	Controllers       []Controller                   `yaml:"controllers"`
+	Services          []Service                      `yaml:"services"`
 }
 
 func NewVectra(projectPath string) *Vectra {
@@ -49,32 +136,26 @@ func NewVectra(projectPath string) *Vectra {
 		vectra = defaultVectra
 	}
 	vectra.ProjectPath = projectPath
-
-	core := NewCore(&vectra)
-	i18n := NewI18n(&vectra)
-	static := NewStatic(&vectra)
-	generators := map[string]IGenerator{
-		core.Name:   core,
-		i18n.Name:   i18n,
-		static.Name: static,
-	}
-	vectra.generators = generators
+	vectra.generators = generatorsToMap(
+		NewCore(&vectra),
+		NewI18n(&vectra),
+		NewStatic(&vectra),
+		NewTypes(&vectra),
+		NewServices(&vectra),
+		NewControllers(&vectra),
+	)
 
 	return &vectra
 }
 
-type Configuration struct {
-	Storage StorageType
-}
+func generatorsToMap(g ...*Generator) map[string]IGenerator {
 
-type StorageType struct {
-	Types map[string][]Attribute
-}
+	m := map[string]IGenerator{}
+	for _, generator := range g {
+		m[generator.Name] = generator.IGenerator
+	}
 
-type Attribute struct {
-	Name string
-	Type string
-	Tag  string
+	return m
 }
 
 func (v *Vectra) Init() {
@@ -94,7 +175,7 @@ func (v *Vectra) Init() {
 		"project.yml",
 	)
 	if os.WriteFile(path, data, 0644) != nil {
-		log.Printf("Failed to write project config.\n")
+		log.Println("Failed to write project config.")
 	}
 }
 

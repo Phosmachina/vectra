@@ -4,7 +4,7 @@
     {{- if .Name | IsNotPlural -}}
         {{- $len := len .Items -}}
         {{- if eq $len 0 -}}
-            {{ .Name | OnlyPrefix | Upper }},
+            {{ .Name | TrimPluralization | Upper }},
         {{else}}
             {{ .Name | Upper }}: {
             {{- range $key, $value := .Items -}}

@@ -5,9 +5,13 @@ import (
 	"embed"
 	"encoding/hex"
 	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"gopkg.in/yaml.v3"
 	"io"
 	"io/fs"
+	"log"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -45,10 +49,10 @@ type Report struct {
 }
 
 type SourceFile struct {
-	TemplatePath string `yaml:"-"`
 	RealPath     string `yaml:"path"`
 	Hash         string `yaml:"hash"`
 	Kind         int8   `yaml:"kind"`
+	templatePath string `yaml:"-"`
 	isTmpl       bool   `yaml:"-"`
 }
 
@@ -58,7 +62,7 @@ func NewSourceFile(path string, kind int8) SourceFile {
 
 func NewDynSourceFile(path string, realpath string, kind int8) SourceFile {
 	return SourceFile{
-		TemplatePath: filepath.Join(FolderTemplate, path),
+		templatePath: filepath.Join(FolderTemplate, path),
 		RealPath:     realpath,
 		Kind:         kind,
 		isTmpl:       strings.HasSuffix(path, ".tmpl"),
@@ -71,6 +75,7 @@ type IGenerator interface {
 }
 
 type Generator struct {
+	IGenerator
 	Name        string
 	projectPath string
 
@@ -130,14 +135,14 @@ func (g *Generator) Generate(data any) {
 		}
 
 		if !file.isTmpl {
-			f, _ := EmbedFS.Open(file.TemplatePath)
+			f, _ := EmbedFS.Open(file.templatePath)
 			stat, _ := f.Stat()
 
 			var err error
 			if stat.IsDir() {
-				err = copyDir(file.TemplatePath, outputFile)
+				err = copyDir(file.templatePath, outputFile)
 			} else {
-				err = copyFile(file.TemplatePath, outputFile)
+				err = copyFile(file.templatePath, outputFile)
 			}
 			if err != nil {
 				// TODO print error
@@ -145,7 +150,7 @@ func (g *Generator) Generate(data any) {
 
 			continue
 		}
-		in, err := EmbedFS.ReadFile(file.TemplatePath)
+		in, err := EmbedFS.ReadFile(file.templatePath)
 		if err != nil {
 			// TODO print error
 			continue
@@ -161,7 +166,11 @@ func (g *Generator) Generate(data any) {
 		parsed, err := template.New("tmpl").Funcs(
 			template.FuncMap{"Upper": Upper},
 		).Funcs(
-			template.FuncMap{"OnlyPrefix": OnlyPrefix},
+			template.FuncMap{"TrimPluralization": TrimPluralization},
+		).Funcs(
+			template.FuncMap{"KeyExist": KeyExist},
+		).Funcs(
+			template.FuncMap{"TrimNewPrefix": TrimNewPrefix},
 		).Funcs(
 			template.FuncMap{"IsNotPlural": IsNotPlural},
 		).Parse(string(in))
@@ -169,7 +178,8 @@ func (g *Generator) Generate(data any) {
 			// TODO print error
 		}
 
-		if parsed.Execute(out, data) != nil {
+		err = parsed.Execute(out, data)
+		if err != nil {
 			// TODO print error
 		}
 	}
@@ -311,7 +321,7 @@ func IsNotPlural(str string) bool {
 	return !strings.HasSuffix(str, "_plural")
 }
 
-func OnlyPrefix(str string) string {
+func TrimPluralization(str string) string {
 	if len(str) == 0 {
 		return str
 	}
@@ -324,6 +334,19 @@ func OnlyPrefix(str string) string {
 	}
 
 	return str
+}
+
+func TrimNewPrefix(str string) string {
+	if len(str) == 0 {
+		return str
+	}
+
+	return strings.TrimPrefix(strings.TrimPrefix(str, "new"), "New")
+}
+
+func KeyExist(key string, m map[string]string) bool {
+	_, ok := m[key]
+	return ok
 }
 
 //endregion
@@ -415,6 +438,55 @@ func copyDir(src, dst string) error {
 	}
 
 	return nil
+}
+
+func extractFunctionBody(path string) map[string]string {
+
+	bodiesByName := map[string]string{}
+
+	file, err := os.Open(path)
+	if err != nil {
+		return map[string]string{}
+	}
+	defer file.Close()
+
+	// Parse the Go file
+	node, err := parser.ParseFile(token.NewFileSet(), "", file, parser.AllErrors)
+	if err != nil {
+		return map[string]string{}
+	}
+
+	// Iterate through the functions and extract their bodies
+	for _, function := range node.Decls {
+		if function, ok := function.(*ast.FuncDecl); ok {
+			bodiesByName[function.Name.Name] = extractPartOfFile(function.Body.Lbrace+1, function.Body.Rbrace-1, file)
+		}
+	}
+
+	return bodiesByName
+}
+
+func extractPartOfFile(start, end token.Pos, file *os.File) string {
+	_, err := file.Seek(0, 0)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Read the file content into a buffer
+	fileInfo, _ := file.Stat()
+	fileSize := fileInfo.Size()
+	buffer := make([]byte, fileSize)
+
+	_, err = file.Read(buffer)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Extract the specified portion of the file content
+	body := buffer[start:end]
+
+	// Convert the formatted body to string and remove leading/trailing whitespace
+	return string(body)
 }
 
 func getLastModifiedTimes(filePaths []string) ([]time.Time, error) {
