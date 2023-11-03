@@ -1,11 +1,13 @@
 package generator
 
 import (
+	"bytes"
 	"crypto/md5"
 	"embed"
 	"encoding/hex"
 	"fmt"
 	"go/ast"
+	"go/format"
 	"go/parser"
 	"go/token"
 	"gopkg.in/yaml.v3"
@@ -135,10 +137,13 @@ func (g *Generator) Generate(data any) {
 		}
 
 		if !file.isTmpl {
-			f, _ := EmbedFS.Open(file.templatePath)
+			f, err := EmbedFS.Open(file.templatePath)
+			if err != nil {
+				log.Println("Failed to handle", file.templatePath)
+				continue
+			}
 			stat, _ := f.Stat()
 
-			var err error
 			if stat.IsDir() {
 				err = copyDir(file.templatePath, outputFile)
 			} else {
@@ -178,7 +183,20 @@ func (g *Generator) Generate(data any) {
 			// TODO print error
 		}
 
-		err = parsed.Execute(out, data)
+		buf := new(bytes.Buffer)
+
+		err = parsed.Execute(buf, data)
+		if err != nil {
+			// TODO print error
+
+			continue
+		}
+
+		ar := buf.Bytes()
+		if strings.HasSuffix(file.RealPath, ".go") && formatGoCode(buf) == nil {
+			ar = buf.Bytes()
+		}
+		_, err = out.Write(ar)
 		if err != nil {
 			// TODO print error
 		}
@@ -337,7 +355,7 @@ func TrimPluralization(str string) string {
 }
 
 func TrimNewPrefix(str string) string {
-	if len(str) == 0 {
+	if len(str) < 3 {
 		return str
 	}
 
@@ -489,6 +507,24 @@ func extractPartOfFile(start, end token.Pos, file *os.File) string {
 	return string(body)
 }
 
+func formatGoCode(input *bytes.Buffer) error {
+	// Parse the input Go code
+	set := token.NewFileSet()
+	node, err := parser.ParseFile(set, "", input, parser.ParseComments)
+	if err != nil {
+		log.Printf("Error parsing Go code: %v", err)
+		return err
+	}
+
+	// Format the parsed node into the input buffer
+	input.Reset() // Clear the buffer before writing formatted code
+	if err := format.Node(input, set, node); err != nil {
+		log.Printf("Error formatting Go code: %v", err)
+		return err
+	}
+
+	return nil
+}
 func getLastModifiedTimes(filePaths []string) ([]time.Time, error) {
 	var modifiedTimes []time.Time
 
