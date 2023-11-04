@@ -124,9 +124,25 @@ func (g *Generator) init() {
 	}
 }
 
-func (g *Generator) Generate(data any) {
+func (g *Generator) Generate(ctx any) {
 
-	for _, file := range g.nextReport.Files {
+	var ctxs []any
+	if reflect.TypeOf(ctx).Kind() == reflect.Slice {
+		sliceValue := reflect.ValueOf(ctx)
+		length := sliceValue.Len()
+		ctxs = make([]any, length)
+		for i := 0; i < length; i++ {
+			ctxs[i] = sliceValue.Index(i).Interface()
+		}
+	}
+
+	nbCtx := len(ctxs)
+	if nbCtx > 1 && nbCtx != len(g.nextReport.Files) {
+		log.Println("Incoherent number of context: generation cancelled.")
+		return
+	}
+
+	for i, file := range g.nextReport.Files {
 
 		outputFile := filepath.Join(g.projectPath, file.RealPath)
 
@@ -184,8 +200,12 @@ func (g *Generator) Generate(data any) {
 		}
 
 		buf := new(bytes.Buffer)
-
-		err = parsed.Execute(buf, data)
+		if nbCtx == 0 {
+			err = parsed.Execute(buf, ctx)
+		} else {
+			data := ctxs[i]
+			err = parsed.Execute(buf, data)
+		}
 		if err != nil {
 			// TODO print error
 
@@ -278,7 +298,10 @@ func (g *Generator) isUpToDate() bool {
 }
 
 func (g *Generator) isWaitingForGeneration() bool {
-	return !reflect.DeepEqual(g.nextReport.Config, g.lastReport.Config)
+	// BUG getAsMap is not recursive: all sub types are not map.
+	//  Maybe marshal to yaml before...
+	equal := reflect.DeepEqual(g.nextReport.Config, g.lastReport.Config)
+	return !equal
 }
 
 func printLogPrefix(kind int8, fileKind int8) {

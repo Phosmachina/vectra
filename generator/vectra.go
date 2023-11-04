@@ -45,6 +45,7 @@ var (
 					{Name: "Domain", Type: "string"},
 					{Name: "TabTitle", Type: "string"},
 					{Name: "Lang", Type: "string"},
+					{Name: "User", Type: "UserCtx"},
 				}},
 				{Name: "UserCtx", Attributes: []SimpleAttribute{
 					{Name: "ID", Type: "string"},
@@ -67,31 +68,63 @@ var (
 		},
 
 		Controllers: []Controller{
-			{
+			{Name: "View",
 				IsView: true,
 				Routes: []Route{
-					{
-						Kind:   "Get",
-						Path:   "/index",
-						Target: "Index",
-					},
+					{Kind: "Get", Path: "/", Target: "root"},
+					{Kind: "Get", Path: "/init", Target: "init"},
+					{Kind: "Get", Path: "/login", Target: "login"},
+					{Kind: "Get", Path: "/sign", Target: "sign"},
+				},
+			},
+			{Name: "ApiV1",
+				IsView: false,
+				Routes: []Route{
+					{Kind: "Post", Path: "/activate/admin", Target: "activateAdmin"},
+					{Kind: "Post", Path: "/login", Target: "login"},
 				},
 			},
 		},
 		Services: []Service{
 			{
-				Name: "ApiV2",
+				Name: "ApiV1",
 				Errors: []string{
-					"ErrorInvalidUserId",
+					"ErrorNotFirstLaunch",
+					"ErrorInvalidToken",
+					"ErrorUnauthorised",
+					"ErrorUserExist",
+					"ErrorUserDisabled",
+					"ErrorInvalidUserRef",
 				},
 				Methods: []Method{
-					{
-						Name: "RemoveUser",
+					{Name: "IsFirstLaunch",
 						Inputs: []SimpleAttribute{
 							{Name: "Id", Type: "string"},
 						},
-						Outputs: []string{"error"},
-					},
+						Outputs: []string{"bool"}},
+					{Name: "IsConnected",
+						Inputs: []SimpleAttribute{
+							{Name: "session", Type: "*session.Session"},
+						},
+						Outputs: []string{"Role"}},
+					{Name: "ActivateAdmin",
+						Inputs: []SimpleAttribute{
+							{Name: "info", Type: "ActivateAdminExch"},
+						},
+						Outputs: []string{"error"}},
+					{Name: "Connect",
+						Inputs: []SimpleAttribute{
+							{Name: "info", Type: "ConnectExch"},
+							{Name: "cookie", Type: "string"},
+							{Name: "ua", Type: "string"},
+						},
+						Outputs: []string{"error", "*ObjWrapper[User]"}},
+					{Name: "GetStore",
+						Inputs:  []SimpleAttribute{},
+						Outputs: []string{"*Storage"}},
+					{Name: "GetAccessManager",
+						Inputs:  []SimpleAttribute{},
+						Outputs: []string{"*AccessManager"}},
 				},
 			},
 		},
@@ -114,8 +147,8 @@ type Vectra struct {
 	WithPugExample    bool                           `yaml:"with_pug_example"`
 	WithIdeaConfig    bool                           `yaml:"with_idea_config"`
 	WithDockerPipe    bool                           `yaml:"with_docker_pipe"`
-	StorageTypes      []VectraType[SimpleAttribute]  `yaml:"storage_types"`
 	ExchangeTypes     []VectraType[AttributeWithTag] `yaml:"exchange_types"`
+	StorageTypes      []VectraType[SimpleAttribute]  `yaml:"storage_types"`
 	ViewTypes         ViewTypes                      `yaml:"view_types"`
 	Controllers       []Controller                   `yaml:"controllers"`
 	Services          []Service                      `yaml:"services"`

@@ -1,7 +1,5 @@
 package generator
 
-import "path/filepath"
-
 type ViewTypes struct {
 	Types        []VectraType[SimpleAttribute] `yaml:"types"`
 	Constructors []VectraType[SimpleAttribute] `yaml:"constructors"`
@@ -33,8 +31,8 @@ func NewTypes(cfg *Vectra) *Generator {
 	generator := NewAbstractGenerator(
 		"types",
 		[]string{
-			"StorageTypes",
 			"ExchangeTypes",
+			"StorageTypes",
 			"ViewTypes",
 		},
 		Report{
@@ -54,8 +52,9 @@ func NewTypes(cfg *Vectra) *Generator {
 
 func (i *Types) Generate() {
 
-	i.vectra.ViewTypes.Bodies = extractFunctionBody(filepath.Join(i.vectra.ProjectPath,
-		"src", "view", "go", "view.go"))
+	i.vectra.ViewTypes.Bodies = extractFunctionBody(
+		i.vectra.ProjectPath + "src/view/go/view.go")
+
 	i.Generator.Generate(map[string]any{
 		"StorageTypes":  i.vectra.StorageTypes,
 		"ExchangeTypes": i.vectra.ExchangeTypes,

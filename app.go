@@ -73,11 +73,11 @@ func main() {
 					},
 				},
 				{
-					Name:  "controller",
+					Name:  "controllers",
 					Usage: "Generate controllers part of the Vectra project",
 					Action: func(c *cli.Context) error {
-						log.Println("Generating controller template.")
-						vectra.Generate("controller")
+						log.Println("Generating controllers template.")
+						vectra.Generate("controllers")
 						return nil
 					},
 				},

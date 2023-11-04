@@ -1,0 +1,51 @@
+package controller
+
+import (
+    "github.com/gofiber/fiber/v2"
+    "github.com/gofiber/fiber/v2/middleware/session"
+)
+
+
+type {{ .Name }}Controller struct {
+    Controller
+}
+
+func New{{ .Name }}Controller(r fiber.Router, store *session.Store) {
+    new{{ .Name }}Controller(r, store)
+
+    {{ range .Routes }}
+        r.{{ .Kind }}("{{ .Path }}", controller.{{ .Target }})
+    {{- end }}
+}
+
+{{ $bodies := .Bodies -}}
+{{- $name := .Name -}}
+
+{{ range .Routes }}
+func (c {{ $name }}) {{ .Target }}(ctx *fiber.Ctx) error {
+{{- if KeyExist .Target $bodies }}
+    {{ index $bodies .Target -}}
+{{ else if eq "root" .Target }}
+    return HandleView(ctx, c, func(buf io.Writer, userId string) error {
+    Jade_index(NewGlobalCtx("Index", userId), buf)
+    return nil
+    })
+{{ else if eq "init" .Target }}
+    return HandleView(ctx, c, func(buf io.Writer, userId string) error {
+    Jade_init(NewGlobalCtx("Initialization", userId), buf)
+    return nil
+    })
+{{ else if eq "login" .Target }}
+    return HandleView(ctx, c, func(buf io.Writer, userId string) error {
+    if userId != "" {
+    return ctx.Redirect("/", fiber.StatusPreconditionRequired)
+    }
+    Jade_login(NewGlobalCtx("Login", userId), buf)
+    return nil
+    })
+{{ else if eq "sign" .Target }}
+    return ctx.SendStatus(fiber.StatusOK)
+{{ end -}}
+}
+
+{{ end }}

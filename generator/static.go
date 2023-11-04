@@ -17,11 +17,11 @@ func NewStatic(cfg *Vectra) *Generator {
 		files = append(files, NewSourceFile("data/i18n/", Copy))
 	}
 	if cfg.WithPugExample {
-		files = append(files, NewSourceFile("view/pug/shared/layout.pug", Copy))
-		files = append(files, NewSourceFile("view/pug/shared/mixins.pug", Copy))
-		files = append(files, NewSourceFile("view/pug/index.pug", Skeleton))
-		files = append(files, NewSourceFile("view/pug/init.pug", Copy))
-		files = append(files, NewSourceFile("view/pug/login.pug", Copy))
+		files = append(files, NewSourceFile("src/view/pug/shared/layout.pug", Copy))
+		files = append(files, NewSourceFile("src/view/pug/shared/mixins.pug", Copy))
+		files = append(files, NewSourceFile("src/view/pug/index.pug", Skeleton))
+		files = append(files, NewSourceFile("src/view/pug/init.pug", Copy))
+		files = append(files, NewSourceFile("src/view/pug/login.pug", Copy))
 	}
 	if cfg.WithGitignore {
 		files = append(files, NewSourceFile(".gitignore", Copy))

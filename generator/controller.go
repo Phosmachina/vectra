@@ -1,8 +1,15 @@
 package generator
 
+import (
+	"fmt"
+	"strings"
+)
+
 type Controller struct {
-	IsView bool    `yaml:"is_view"`
-	Routes []Route `yaml:"routes"`
+	Name   string            `yaml:"name"`
+	IsView bool              `yaml:"is_view"`
+	Routes []Route           `yaml:"routes"`
+	Bodies map[string]string `yaml:"-"`
 }
 
 type Route struct {
@@ -17,13 +24,28 @@ type Controllers struct {
 
 func NewControllers(cfg *Vectra) *Generator {
 
+	var files []SourceFile
+	for _, controller := range cfg.Controllers {
+		kindStr := "service"
+		if controller.IsView {
+			kindStr = "view"
+		}
+		files = append(files,
+			NewDynSourceFile(
+				fmt.Sprintf("src/controller/%s_controller.go.tmpl", kindStr),
+				fmt.Sprintf("src/controller/%s_controller.go",
+					strings.ToLower(controller.Name)),
+				Skeleton),
+		)
+	}
+
 	generator := NewAbstractGenerator(
 		"controllers",
-		[]string{},
+		[]string{
+			"Controllers",
+		},
 		Report{
-			Files: []SourceFile{
-				NewSourceFile("", FullGen),
-			},
+			Files:   files,
 			Version: 1,
 		}, cfg)
 
@@ -35,5 +57,13 @@ func NewControllers(cfg *Vectra) *Generator {
 }
 
 func (i *Controllers) Generate() {
-	i.Generator.Generate(map[string]any{})
+
+	for _, controller := range i.vectra.Controllers {
+		controller.Bodies = extractFunctionBody(
+			i.vectra.ProjectPath + "src/controller/" +
+				fmt.Sprintf("%s_controller.go", strings.ToLower(controller.Name)),
+		)
+	}
+
+	i.Generator.Generate(i.vectra.Controllers)
 }
