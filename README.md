@@ -1,26 +1,8 @@
-<style>
+<h1 align="center">
+    <img src="docs/vectra_banner.svg" alt="Banner" width="50%">
+</h1>
 
-html{
-  text-align: justify;
-}
-
-.language{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 1 0 300px;
-}
-
-</style>
-
-[//]: # (<img src="docs/vectra_banner.svg" alt="Banner" style="width: 100%;padding: 3rem">)
-
-<img src="docs/test.svg" width="100%" alt="test">
-
-[//]: # (<img src="docs/overview.svg" width="100%" alt="Click to see the source">)
-
-
-<div style="display: flex; justify-content: center">
+<div align="center">
 <details>
 <summary>
  Table of contents
@@ -43,58 +25,17 @@ html{
 
 The main goal of the project is to create a versatile multi-language template and toolkit
 for website servers and backend systems. It strives to achieve this by integrating the
-best
-existing technologies, resulting in an efficient and fast server experience. The goal is
-to minimize the complexity of development as much as possible. Ultimately, Vectra's goal
-is to leverage the unique design of each technology to achieve specific goals without
-investing excessive time and effort.
+best existing technologies, resulting in an efficient and fast server experience. The 
+goal is to minimize the complexity of development as much as possible. Ultimately, 
+Vectra's goal is to leverage the unique design of each technology to achieve specific 
+goals without investing excessive time and effort.
 
-<div style="display: flex; gap: 20px; flex-wrap: wrap; 
-padding-top: 20px" >
-
-<div class="language">
-<img src="docs/go_logo.svg" alt="Banner" style="height: 100px">
-<p>
-<strong>Go</strong> is a highly efficient and scalable programming language that enables 
-rapid development of web applications. It provides a rich set of libraries and tools,
-making it a popular choice for building server-side applications. With Go, you can create
-robust and high-performance websites that handle large amounts of traffic without compromising speed or stability.
-</p>
-</div>
-
-<div class="language">
-<img src="docs/sass.svg" alt="Banner" style="height: 100px">
-<p>
-<strong>Sass</strong> (Syntactically Awesome Style Sheets) is a mature and widely adopted CSS 
-extension language. It introduces powerful features like variables, mixins, and nested selectors, enabling developers to write clean, modular, and maintainable stylesheets. Sass seamlessly integrates with Vectra, allowing you to write reusable and easily customizable styles.
-</p>
-
-</div>
-
-<div class="language">
-<img src="docs/pug_logo.svg" alt="Banner" style="height: 100px">
-<p>
-<strong>Pug</strong> (formerly known as Jade) is a concise and expressive templating 
-language that simplifies the creation of HTML markup. It provides a clean syntax with minimal clutter, reducing the amount of code you need to write. Pug supports reusable components, layout inheritance, and conditional rendering, allowing you to create dynamic and visually appealing web pages effortlessly.
-</p>
-</div>
-
-<div class="language">
-<img src="docs/badgerdb_logo.png" alt="Banner" style="height: 100px">
-<p>
-<strong>BadgerDB</strong> is a fast and efficient key-value store written in Go. It 
-provides a simple and reliable database solution for storing and retrieving data 
-within your backend. With Badger, you can easily manage your backend's data persistence, 
-ensuring speedy access and efficient handling of user interactions.
-</p>
-
-</div>
-
-</div>
+<img src="docs/technologies.svg" width="100%" height="750px" alt="technologies overview">
 
 By combining these technologies, Vectra offers a robust and streamlined development
 environment. It reduces the need for complex setups and integrations, allowing you to
 focus on building the core functionality and design of your website.
+
 
 ## ⚡️ Features
 
