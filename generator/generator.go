@@ -127,7 +127,7 @@ func (g *Generator) init() {
 func (g *Generator) Generate(ctx any) {
 
 	var ctxs []any
-	if reflect.TypeOf(ctx).Kind() == reflect.Slice {
+	if ctx != nil && reflect.TypeOf(ctx).Kind() == reflect.Slice {
 		sliceValue := reflect.ValueOf(ctx)
 		length := sliceValue.Len()
 		ctxs = make([]any, length)
@@ -186,6 +186,8 @@ func (g *Generator) Generate(ctx any) {
 
 		parsed, err := template.New("tmpl").Funcs(
 			template.FuncMap{"Upper": Upper},
+		).Funcs(
+			template.FuncMap{"ToLower": strings.ToLower},
 		).Funcs(
 			template.FuncMap{"TrimPluralization": TrimPluralization},
 		).Funcs(

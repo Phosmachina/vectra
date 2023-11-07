@@ -1,0 +1,64 @@
+package service
+
+import (
+	"errors"
+)
+
+var instance *ApiV1
+
+var (
+{{ range .Errors -}}
+	{{ . }}   = errors.New("{{ . }}")
+{{ end -}}
+)
+
+type {{ .Name }} struct {
+	service
+}
+
+func new{{ .Name }}() *{{ .Name }} {
+	a := &{{ .Name }}{}
+	a.service = *newService()
+
+	return a
+}
+
+func Get{{ .Name }}() *{{ .Name }} {
+
+	if instance == nil {
+		lock.Lock()
+		defer lock.Unlock()
+		if instance == nil {
+			instance = new{{ .Name }}()
+		}
+	}
+
+	return instance
+}
+{{ $bodies := .Bodies -}}
+{{- $name := .Name -}}
+
+{{ range .Methods }}
+func (a *{{ $name }}) {{ .Name }}(
+{{- range .Inputs }} {{ .Name }} {{ .Type }}, {{ end }}) (
+{{- range .Outputs }} {{ . }}, {{ end -}}) {
+{{ if KeyExist .Name $bodies }}
+	{{ index $bodies .Target -}}
+{{ else if eq "" .Name }}
+{{ end -}}
+}
+{{ end }}
+
+// region Exchange type declaration
+
+{{ range .ExchangeTypes }}
+
+type ConnectExch struct {
+{{ range .Attributes -}}
+	{{ .Name }} {{ .Type }} `mod:"{{ .ModTag }}" validate:"{{ .ValidatorTag}}" json:"{{ .Name | ToLower }}"`
+{{ end -}}
+}
+
+{{ end }}
+
+// endregion

@@ -20,10 +20,30 @@ type configuration struct {
 	AccessRules []AccessRule   `yaml:"access_rules"`
 }
 
+{{ with .StorageTypes }}
+
 func GobRegistration() {
-	gob.Register(Role{})
-	gob.Register(User{})
-	// TEMPLATE: gob.Register here
+{{ range . -}}
+	gob.Register({{ .Name }}{})
+{{ end -}}
 }
 
-// TEMPLATE: declare your db object here
+{{ range . }}
+type {{ .Name}} struct {
+	DBObject
+{{ range .Attributes -}}
+	{{ .Name }} {{ .Type }}
+{{ end -}}
+}
+
+func New{{ .Name }}() {{ .Name }} {
+	obj := {{ .Name }}{}
+	obj.IObject = obj
+	return obj
+}
+
+func (o {{ .Name }}) ToString() string  { return ToString(o) }
+func (o {{ .Name }}) TableName() string { return NameOfStruct[{{ .Name }}]() }
+{{ end }}
+
+{{ end }}

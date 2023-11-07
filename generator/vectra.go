@@ -24,19 +24,16 @@ var (
 		WithIdeaConfig:    true,
 		WithDockerPipe:    true,
 		StorageTypes: []VectraType[SimpleAttribute]{
-			{Name: "DemoStorageType", Attributes: []SimpleAttribute{
-				{Name: "Field1", Type: "bool"},
-				{Name: "Field2", Type: "[]string"},
-			}},
-		},
-		ExchangeTypes: []VectraType[AttributeWithTag]{
-			{Name: "DemoExchangeType", Attributes: []AttributeWithTag{
-				{
-					SimpleAttribute: SimpleAttribute{Name: "Name", Type: "string"},
-					ModTag:          "trim,camel",
-					ValidatorTag:    "required",
-				},
-			}},
+			{Name: "Role", Attributes: []SimpleAttribute{
+				{Name: "Name", Type: "string"},
+				{Name: "Level", Type: "int"}}},
+			{Name: "User", Attributes: []SimpleAttribute{
+				{Name: "IsActivated", Type: "bool"},
+				{Name: "Password", Type: "[]byte"},
+				{Name: "Firstname", Type: "string"},
+				{Name: "Lastname", Type: "string"},
+				{Name: "Email", Type: "string"},
+				{Name: "Sessions", Type: "map[string]SessionItem"}}},
 		},
 		ViewTypes: ViewTypes{
 			Types: []VectraType[SimpleAttribute]{
@@ -66,7 +63,6 @@ var (
 				}},
 			},
 		},
-
 		Controllers: []Controller{
 			{Name: "View",
 				IsView: true,
@@ -126,6 +122,38 @@ var (
 						Inputs:  []SimpleAttribute{},
 						Outputs: []string{"*AccessManager"}},
 				},
+				ExchangeTypes: []VectraType[AttributeWithTag]{
+					{Name: "ConnectExch", Attributes: []AttributeWithTag{
+						{SimpleAttribute: SimpleAttribute{Name: "Email", Type: "string"},
+							ModTag: "trim,lcase", ValidatorTag: "required,email"},
+						{SimpleAttribute: SimpleAttribute{Name: "Password", Type: "string"},
+							ModTag: "", ValidatorTag: "required"},
+					}},
+					{Name: "ConnectAdminExch", Attributes: []AttributeWithTag{
+						{SimpleAttribute: SimpleAttribute{Name: "Password", Type: "string"},
+							ModTag: "", ValidatorTag: "required"},
+						{SimpleAttribute: SimpleAttribute{Name: "Email", Type: "string"},
+							ModTag: "trim,lcase", ValidatorTag: "required,email"},
+						{SimpleAttribute: SimpleAttribute{Name: "Token", Type: "string"},
+							ModTag: "", ValidatorTag: "required"},
+					}},
+					{Name: "UserExch", Attributes: []AttributeWithTag{
+						{SimpleAttribute: SimpleAttribute{Name: "ID", Type: "string"},
+							ModTag: "", ValidatorTag: ""},
+						{SimpleAttribute: SimpleAttribute{Name: "Password", Type: "string"},
+							ModTag: "trim,lcase", ValidatorTag: "required"},
+						{SimpleAttribute: SimpleAttribute{Name: "Firstname", Type: "string"},
+							ModTag: "trim,lcase", ValidatorTag: "required"},
+						{SimpleAttribute: SimpleAttribute{Name: "Lastname", Type: "string"},
+							ModTag: "trim,lcase", ValidatorTag: "required"},
+						{SimpleAttribute: SimpleAttribute{Name: "Email", Type: "string"},
+							ModTag: "trim,lcase", ValidatorTag: "required,email"},
+					}},
+					{Name: "ReasonExch", Attributes: []AttributeWithTag{
+						{SimpleAttribute: SimpleAttribute{Name: "Reason", Type: "string"},
+							ModTag: "", ValidatorTag: ""},
+					}},
+				},
 			},
 		},
 	}
@@ -135,23 +163,22 @@ type Vectra struct {
 	generators  map[string]IGenerator `yaml:"-"`
 	ProjectPath string                `yaml:"-"`
 
-	DefaultLang       string                         `yaml:"default_lang"`
-	DevPort           int                            `yaml:"dev_port"`
-	ProductionPort    int                            `yaml:"production_port"`
-	ProductionDomain  string                         `yaml:"production_domain"`
-	WithGitignore     bool                           `yaml:"with_gitignore"`
-	WithDockerfile    bool                           `yaml:"with_dockerfile"`
-	WithDockerCompose bool                           `yaml:"with_docker_compose"`
-	WithI18nExample   bool                           `yaml:"with_i18n_example"`
-	WithSassExample   bool                           `yaml:"with_sass_example"`
-	WithPugExample    bool                           `yaml:"with_pug_example"`
-	WithIdeaConfig    bool                           `yaml:"with_idea_config"`
-	WithDockerPipe    bool                           `yaml:"with_docker_pipe"`
-	ExchangeTypes     []VectraType[AttributeWithTag] `yaml:"exchange_types"`
-	StorageTypes      []VectraType[SimpleAttribute]  `yaml:"storage_types"`
-	ViewTypes         ViewTypes                      `yaml:"view_types"`
-	Controllers       []Controller                   `yaml:"controllers"`
-	Services          []Service                      `yaml:"services"`
+	DefaultLang       string                        `yaml:"default_lang"`
+	DevPort           int                           `yaml:"dev_port"`
+	ProductionPort    int                           `yaml:"production_port"`
+	ProductionDomain  string                        `yaml:"production_domain"`
+	WithGitignore     bool                          `yaml:"with_gitignore"`
+	WithDockerfile    bool                          `yaml:"with_dockerfile"`
+	WithDockerCompose bool                          `yaml:"with_docker_compose"`
+	WithI18nExample   bool                          `yaml:"with_i18n_example"`
+	WithSassExample   bool                          `yaml:"with_sass_example"`
+	WithPugExample    bool                          `yaml:"with_pug_example"`
+	WithIdeaConfig    bool                          `yaml:"with_idea_config"`
+	WithDockerPipe    bool                          `yaml:"with_docker_pipe"`
+	StorageTypes      []VectraType[SimpleAttribute] `yaml:"storage_types"`
+	ViewTypes         ViewTypes                     `yaml:"view_types"`
+	Controllers       []Controller                  `yaml:"controllers"`
+	Services          []Service                     `yaml:"services"`
 }
 
 func NewVectra(projectPath string) *Vectra {

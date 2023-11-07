@@ -31,13 +31,12 @@ func NewTypes(cfg *Vectra) *Generator {
 	generator := NewAbstractGenerator(
 		"types",
 		[]string{
-			"ExchangeTypes",
 			"StorageTypes",
 			"ViewTypes",
 		},
 		Report{
 			Files: []SourceFile{
-				//NewSourceFile("src/model/storage/storage_gen.go.tmpl", FullGen),
+				NewSourceFile("src/model/storage/types.go.tmpl", FullGen),
 				NewSourceFile("src/view/go/view.go.tmpl", Skeleton),
 			},
 			Version: 1,
@@ -56,8 +55,7 @@ func (i *Types) Generate() {
 		i.vectra.ProjectPath + "src/view/go/view.go")
 
 	i.Generator.Generate(map[string]any{
-		"StorageTypes":  i.vectra.StorageTypes,
-		"ExchangeTypes": i.vectra.ExchangeTypes,
-		"ViewTypes":     i.vectra.ViewTypes,
+		"StorageTypes": i.vectra.StorageTypes,
+		"ViewTypes":    i.vectra.ViewTypes,
 	})
 }

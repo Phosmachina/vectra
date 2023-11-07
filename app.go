@@ -1,7 +1,7 @@
 package main
 
 import (
-	"Vectra/generator"
+	"github.com/phosmachina/Vectra/generator"
 	"github.com/urfave/cli"
 	"log"
 	"os"
@@ -105,6 +105,15 @@ func main() {
 					Action: func(c *cli.Context) error {
 						log.Println("Generate types parts following configuration.")
 						vectra.Generate("types")
+						return nil
+					},
+				},
+				{
+					Name:  "services",
+					Usage: "Generate services part of the Vectra project",
+					Action: func(c *cli.Context) error {
+						log.Println("Generate services parts following configuration.")
+						vectra.Generate("services")
 						return nil
 					},
 				},
