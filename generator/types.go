@@ -52,7 +52,7 @@ func NewTypes(cfg *Vectra) *Generator {
 func (i *Types) Generate() {
 
 	i.vectra.ViewTypes.Bodies = extractFunctionBody(
-		i.vectra.ProjectPath + "src/view/go/view.go")
+		i.vectra.ProjectPath + "/src/view/go/view.go")
 
 	i.Generator.Generate(map[string]any{
 		"StorageTypes": i.vectra.StorageTypes,

@@ -58,9 +58,9 @@ func NewControllers(cfg *Vectra) *Generator {
 
 func (i *Controllers) Generate() {
 
-	for _, controller := range i.vectra.Controllers {
-		controller.Bodies = extractFunctionBody(
-			i.vectra.ProjectPath + "src/controller/" +
+	for n, controller := range i.vectra.Controllers {
+		i.vectra.Controllers[n].Bodies = extractFunctionBody(
+			i.vectra.ProjectPath + "/src/controller/" +
 				fmt.Sprintf("%s_controller.go", strings.ToLower(controller.Name)),
 		)
 	}

@@ -55,9 +55,9 @@ func NewServices(cfg *Vectra) *Generator {
 
 func (i *Services) Generate() {
 
-	for _, service := range i.vectra.Services {
-		service.Bodies = extractFunctionBody(
-			i.vectra.ProjectPath + "src/model/service/" +
+	for n, service := range i.vectra.Services {
+		i.vectra.Services[n].Bodies = extractFunctionBody(
+			i.vectra.ProjectPath + "/src/model/service/" +
 				fmt.Sprintf("%s_service.go", strings.ToLower(service.Name)),
 		)
 	}

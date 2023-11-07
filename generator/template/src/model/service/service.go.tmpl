@@ -42,8 +42,8 @@ func Get{{ .Name }}() *{{ .Name }} {
 func (a *{{ $name }}) {{ .Name }}(
 {{- range .Inputs }} {{ .Name }} {{ .Type }}, {{ end }}) (
 {{- range .Outputs }} {{ . }}, {{ end -}}) {
-{{ if KeyExist .Name $bodies }}
-	{{ index $bodies .Target -}}
+{{ if KeyExist .Name $bodies -}}
+	{{ index $bodies .Name -}}
 {{ else if eq "" .Name }}
 {{ end -}}
 }
