@@ -12,17 +12,16 @@ import (
 
 var (
 	defaultVectra = Vectra{
-		DefaultLang:       "en",
-		DevPort:           8080,
-		ProductionPort:    8100,
-		WithGitignore:     true,
-		WithDockerfile:    true,
-		WithDockerCompose: true,
-		WithI18nExample:   true,
-		WithSassExample:   true,
-		WithPugExample:    true,
-		WithIdeaConfig:    true,
-		WithDockerPipe:    true,
+		DefaultLang:          "en",
+		DevPort:              8080,
+		ProductionPort:       8100,
+		WithGitignore:        true,
+		WithDockerDeployment: true,
+		WithI18nExample:      true,
+		WithSassExample:      true,
+		WithPugExample:       true,
+		WithIdeaConfig:       true,
+		WithDockerPipe:       true,
 		StorageTypes: []VectraType[SimpleAttribute]{
 			{Name: "Role", Attributes: []SimpleAttribute{
 				{Name: "Name", Type: "string"},
@@ -94,9 +93,7 @@ var (
 				},
 				Methods: []Method{
 					{Name: "IsFirstLaunch",
-						Inputs: []SimpleAttribute{
-							{Name: "Id", Type: "string"},
-						},
+						Inputs:  []SimpleAttribute{},
 						Outputs: []string{"bool"}},
 					{Name: "IsConnected",
 						Inputs: []SimpleAttribute{
@@ -105,7 +102,12 @@ var (
 						Outputs: []string{"Role"}},
 					{Name: "ActivateAdmin",
 						Inputs: []SimpleAttribute{
-							{Name: "info", Type: "ActivateAdminExch"},
+							{Name: "info", Type: "ConnectAdminExch"},
+						},
+						Outputs: []string{"error"}},
+					{Name: "CreateUser",
+						Inputs: []SimpleAttribute{
+							{Name: "info", Type: "UserExch"},
 						},
 						Outputs: []string{"error"}},
 					{Name: "Connect",
@@ -115,12 +117,6 @@ var (
 							{Name: "ua", Type: "string"},
 						},
 						Outputs: []string{"error", "*ObjWrapper[User]"}},
-					{Name: "GetStore",
-						Inputs:  []SimpleAttribute{},
-						Outputs: []string{"*Storage"}},
-					{Name: "GetAccessManager",
-						Inputs:  []SimpleAttribute{},
-						Outputs: []string{"*AccessManager"}},
 				},
 				ExchangeTypes: []VectraType[AttributeWithTag]{
 					{Name: "ConnectExch", Attributes: []AttributeWithTag{
@@ -163,22 +159,21 @@ type Vectra struct {
 	generators  map[string]IGenerator `yaml:"-"`
 	ProjectPath string                `yaml:"-"`
 
-	DefaultLang       string                        `yaml:"default_lang"`
-	DevPort           int                           `yaml:"dev_port"`
-	ProductionPort    int                           `yaml:"production_port"`
-	ProductionDomain  string                        `yaml:"production_domain"`
-	WithGitignore     bool                          `yaml:"with_gitignore"`
-	WithDockerfile    bool                          `yaml:"with_dockerfile"`
-	WithDockerCompose bool                          `yaml:"with_docker_compose"`
-	WithI18nExample   bool                          `yaml:"with_i18n_example"`
-	WithSassExample   bool                          `yaml:"with_sass_example"`
-	WithPugExample    bool                          `yaml:"with_pug_example"`
-	WithIdeaConfig    bool                          `yaml:"with_idea_config"`
-	WithDockerPipe    bool                          `yaml:"with_docker_pipe"`
-	StorageTypes      []VectraType[SimpleAttribute] `yaml:"storage_types"`
-	ViewTypes         ViewTypes                     `yaml:"view_types"`
-	Controllers       []Controller                  `yaml:"controllers"`
-	Services          []Service                     `yaml:"services"`
+	DefaultLang          string                        `yaml:"default_lang"`
+	DevPort              int                           `yaml:"dev_port"`
+	ProductionPort       int                           `yaml:"production_port"`
+	ProductionDomain     string                        `yaml:"production_domain"`
+	WithGitignore        bool                          `yaml:"with_gitignore"`
+	WithDockerDeployment bool                          `yaml:"with_docker_deployment"`
+	WithI18nExample      bool                          `yaml:"with_i18n_example"`
+	WithSassExample      bool                          `yaml:"with_sass_example"`
+	WithPugExample       bool                          `yaml:"with_pug_example"`
+	WithIdeaConfig       bool                          `yaml:"with_idea_config"`
+	WithDockerPipe       bool                          `yaml:"with_docker_pipe"`
+	StorageTypes         []VectraType[SimpleAttribute] `yaml:"storage_types"`
+	ViewTypes            ViewTypes                     `yaml:"view_types"`
+	Controllers          []Controller                  `yaml:"controllers"`
+	Services             []Service                     `yaml:"services"`
 }
 
 func NewVectra(projectPath string) *Vectra {
@@ -197,9 +192,8 @@ func NewVectra(projectPath string) *Vectra {
 	}
 	vectra.ProjectPath = projectPath
 	vectra.generators = generatorsToMap(
-		NewCore(&vectra),
 		NewI18n(&vectra),
-		NewStatic(&vectra),
+		NewBase(&vectra),
 		NewTypes(&vectra),
 		NewServices(&vectra),
 		NewControllers(&vectra),

@@ -1,19 +1,10 @@
-networks:
-  vm:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.0.0.0/24
 
 services:
-  toolkit-vectra:
-    container_name: toolkit-vectra
-    image: phosmachina/toolkit-vectra
-    networks:
-      vm:
-        ipv4_address: 172.0.0.10
-    ports:
-      - 8080:8100
+  pipe-vectra:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pipe-vectra
     volumes:
       - .:/Project
     restart: unless-stopped

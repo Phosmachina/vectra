@@ -50,6 +50,8 @@ func main() {
 			Name:  "gen",
 			Usage: "Generate Vectra project templates",
 			Action: func(c *cli.Context) error {
+				log.Println("Generate all parts of Vectra.")
+				vectra.FullGenerate()
 				return nil
 			},
 			Subcommands: []cli.Command{
@@ -63,16 +65,6 @@ func main() {
 					},
 				},
 				{
-					Name:  "service",
-					Usage: "Generate services part of the Vectra project",
-					Action: func(c *cli.Context) error {
-						log.Println("Generating model template.")
-						//vectra.Generate("model")
-						// Add model generation logic here
-						return nil
-					},
-				},
-				{
 					Name:  "controllers",
 					Usage: "Generate controllers part of the Vectra project",
 					Action: func(c *cli.Context) error {
@@ -82,20 +74,11 @@ func main() {
 					},
 				},
 				{
-					Name:  "core",
-					Usage: "Generate core part of the Vectra project",
+					Name:  "base",
+					Usage: "Generate base part of the Vectra project",
 					Action: func(c *cli.Context) error {
-						log.Println("Copy core parts following configuration.")
-						vectra.Generate("core")
-						return nil
-					},
-				},
-				{
-					Name:  "static",
-					Usage: "Generate static part of the Vectra project",
-					Action: func(c *cli.Context) error {
-						log.Println("Copy static parts following configuration.")
-						vectra.Generate("static")
+						log.Println("Copy base parts following configuration.")
+						vectra.Generate("base")
 						return nil
 					},
 				},

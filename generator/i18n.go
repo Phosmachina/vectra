@@ -101,7 +101,7 @@ func (i *I18n) loadData(path string, prefix string) error {
 				return err
 			}
 
-			cfg, err := ini.LoadSources(ini.LoadOptions{}, data)
+			cfg, _ := ini.LoadSources(ini.LoadOptions{}, data)
 			for _, k := range cfg.Section("").Keys() {
 				i.dic[fullKey+"."+k.Name()] = k.Value()
 			}

@@ -1,10 +1,12 @@
-services:
 
+services:
   vectra:
     container_name: vectra
-    image: phosmachina/vectra
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "8100:8100"
+      - "{{ .ProductionPort }}:{{ .ProductionPort }}"
     environment:
       - TZ=Europe/Paris
     volumes:

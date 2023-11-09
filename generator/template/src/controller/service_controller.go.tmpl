@@ -1,17 +1,19 @@
 package controller
 
 import (
+. "Vectra/src/model/service"
+. "Vectra/src/model/storage"
 "github.com/gofiber/fiber/v2"
 "github.com/gofiber/fiber/v2/middleware/session"
+. "github.com/phosmachina/FluentKV/reldb"
 )
-
 
 type {{ .Name }}Controller struct {
 Controller
 }
 
 func New{{ .Name }}Controller(r fiber.Router, store *session.Store) {
-new{{ .Name }}Controller(r, store)
+controller := {{ .Name }}Controller{NewController(r, store)}
 
 {{ range .Routes }}
     r.{{ .Kind }}("{{ .Path }}", controller.{{ .Target }})
@@ -22,7 +24,7 @@ new{{ .Name }}Controller(r, store)
 {{- $name := .Name -}}
 
 {{ range .Routes }}
-func (c {{ $name }}) {{ .Target }}(ctx *fiber.Ctx) error {
+func (c {{ $name }}Controller) {{ .Target }}(ctx *fiber.Ctx) error {
 {{- if KeyExist .Target $bodies }}
     {{ index $bodies .Target -}}
 {{ else if eq "activateAdmin" .Target }}

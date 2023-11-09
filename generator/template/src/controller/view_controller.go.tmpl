@@ -1,17 +1,18 @@
 package controller
 
 import (
-    "github.com/gofiber/fiber/v2"
-    "github.com/gofiber/fiber/v2/middleware/session"
+. "Vectra/src/view/go"
+"github.com/gofiber/fiber/v2"
+"github.com/gofiber/fiber/v2/middleware/session"
+"io"
 )
-
 
 type {{ .Name }}Controller struct {
     Controller
 }
 
 func New{{ .Name }}Controller(r fiber.Router, store *session.Store) {
-    new{{ .Name }}Controller(r, store)
+    controller := {{ .Name }}Controller{NewController(r, store)}
 
     {{ range .Routes }}
         r.{{ .Kind }}("{{ .Path }}", controller.{{ .Target }})
@@ -22,7 +23,7 @@ func New{{ .Name }}Controller(r fiber.Router, store *session.Store) {
 {{- $name := .Name -}}
 
 {{ range .Routes }}
-func (c {{ $name }}) {{ .Target }}(ctx *fiber.Ctx) error {
+func (c {{ $name }}Controller) {{ .Target }}(ctx *fiber.Ctx) error {
 {{- if KeyExist .Target $bodies }}
     {{ index $bodies .Target -}}
 {{ else if eq "root" .Target }}

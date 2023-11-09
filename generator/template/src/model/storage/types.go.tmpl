@@ -1,6 +1,9 @@
 package storage
 
-import "encoding/gob"
+import (
+	"encoding/gob"
+	. "github.com/phosmachina/FluentKV/reldb"
+)
 
 type configuration struct {
 	Version     string   `yaml:"version"`

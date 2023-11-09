@@ -3,23 +3,11 @@ package service
 import (
 	. "Vectra/src/model"
 	. "Vectra/src/model/storage"
-	"archive/tar"
-	"compress/gzip"
-	"github.com/gofiber/fiber/v2/middleware/session"
 	. "github.com/phosmachina/FluentKV/reldb"
-	"github.com/tdewolff/minify"
-	"github.com/tdewolff/minify/css"
-	"github.com/tdewolff/minify/js"
-	"golang.org/x/crypto/bcrypt"
 	"io"
 	"log"
-	"net/http"
 	"os"
-	"os/exec"
-	"path/filepath"
-	"strings"
 	"sync"
-	"time"
 )
 
 var (
@@ -27,12 +15,9 @@ var (
 )
 
 type Service interface {
-	IsFirstLaunch() bool
-	IsConnected(session *session.Session) Role
-	ActivateAdmin(info ActivateAdminExch) error
-	Connect(info ConnectExch, cookie string, ua string) (error, *ObjWrapper[User])
 	GetStore() *Storage
 	GetAccessManager() *AccessManager
+	IsFirstLaunch() bool
 }
 
 type service struct {
@@ -47,7 +32,6 @@ func newService() *service {
 	a.store = GetStorage()
 	a.setupAccessManager()
 	a.checkAppToken()
-	a.minifyStaticFiles()
 	return a
 }
 
@@ -59,90 +43,8 @@ func (s *service) GetAccessManager() *AccessManager {
 	return s.accessManager
 }
 
-func (s *service) Connect(info ConnectExch, cookie string, ua string) (error,
-	*ObjWrapper[User]) {
-	var userWrp *ObjWrapper[User]
-
-	userWrp = FindFirst(*s.store.DB, func(id string, value *User) bool {
-		return value.Email == info.Email
-	})
-
-	if userWrp == nil {
-		return ErrorInvalidUserRef, nil
-	}
-	user := userWrp.Value
-
-	if !user.IsActivated {
-		return ErrorUserDisabled, nil
-	}
-	if bcrypt.CompareHashAndPassword(user.Password, []byte(info.Password)) != nil {
-		return ErrorUnauthorised, nil
-	}
-
-	previousSessions := user.Sessions
-	user.Sessions = make(map[string]SessionItem)
-	now := time.Now()
-	for k, s := range previousSessions {
-		if s.LastViewed.Add(time.Hour * 24).After(now) {
-			user.Sessions[k] = s
-		}
-	}
-	user.Sessions[cookie] = SessionItem{LastViewed: now, UA: ua}
-	Set(*s.store.DB, userWrp.ID, user)
-	userWrp.Value = user
-
-	return nil, userWrp
-}
-
-func (s *service) IsConnected(session *session.Session) Role {
-
-	db := *s.store.DB
-
-	userId := session.Get(SessionKeyForUserId).(string)
-
-	userWrp := Get[User](db, userId)
-	if userWrp == nil {
-		return s.accessManager.DefaultRoles["none"].Value
-	}
-
-	cookie := session.ID()
-
-	for k := range userWrp.Value.Sessions {
-		if k == cookie {
-
-			// TODO find the user agent and update user with it.
-			Update(db, userId, func(user *User) {
-				user.Sessions[k] = SessionItem{
-					LastViewed: time.Now(),
-					UA:         "User-Agent",
-				}
-			})
-			return AllFromLinkWrp[User, Role](userWrp)[0].Value
-		}
-	}
-
-	return s.accessManager.DefaultRoles["none"].Value
-}
-
-func (s *service) ActivateAdmin(info ActivateAdminExch) error {
-
-	if !s.IsFirstLaunch() {
-		return ErrorNotFirstLaunch
-	}
-	if info.Token != s.firstLaunchToken {
-		return ErrorInvalidToken
-	}
-
-	password, _ := bcrypt.GenerateFromPassword([]byte(info.Password), bcrypt.DefaultCost)
-	adminWrp := Insert(*s.store.DB, NewUser(true, password, info.Email))
-	Link(adminWrp, true, s.accessManager.DefaultRoles["admin"])
-
-	return nil
-}
-
 func (s *service) IsFirstLaunch() bool {
-	// Check to see if a user has the "admin" role.
-	return len(VisitWrp[Role, User](s.accessManager.DefaultRoles["admin"])) == 0
+	return s.IsFirstLaunch()
 }
 
 // checkAppToken if is the first launch, the initialization token will be generated and write in file.
@@ -201,7 +103,10 @@ func (s *service) setupAccessManager() {
 			return role.Name == name
 		})
 		if roleInDB == nil {
-			roleWrp := Insert[Role](db, NewRole(name, level))
+			role := NewRole()
+			role.Name = name
+			role.Level = level
+			roleWrp := Insert[Role](db, role)
 			s.accessManager.DefaultRoles[name] = roleWrp
 		} else {
 			s.accessManager.DefaultRoles[name] = roleInDB

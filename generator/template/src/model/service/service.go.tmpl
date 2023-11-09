@@ -1,7 +1,12 @@
 package service
 
 import (
-	"errors"
+. "Vectra/src/model/storage"
+"errors"
+"github.com/gofiber/fiber/v2/middleware/session"
+. "github.com/phosmachina/FluentKV/reldb"
+"golang.org/x/crypto/bcrypt"
+"time"
 )
 
 var instance *ApiV1
@@ -39,12 +44,113 @@ func Get{{ .Name }}() *{{ .Name }} {
 {{- $name := .Name -}}
 
 {{ range .Methods }}
-func (a *{{ $name }}) {{ .Name }}(
+func (s *{{ $name }}) {{ .Name }}(
 {{- range .Inputs }} {{ .Name }} {{ .Type }}, {{ end }}) (
 {{- range .Outputs }} {{ . }}, {{ end -}}) {
 {{ if KeyExist .Name $bodies -}}
 	{{ index $bodies .Name -}}
-{{ else if eq "" .Name }}
+{{ else if eq "Connect" .Name }}
+
+	var userWrp *ObjWrapper[User]
+
+	userWrp = FindFirst(*s.store.DB, func(id string, value *User) bool {
+	return value.Email == info.Email
+	})
+
+	if userWrp == nil {
+	return ErrorInvalidUserRef, nil
+	}
+	user := userWrp.Value
+
+	if !user.IsActivated {
+	return ErrorUserDisabled, nil
+	}
+	if bcrypt.CompareHashAndPassword(user.Password, []byte(info.Password)) != nil {
+	return ErrorUnauthorised, nil
+	}
+
+	previousSessions := user.Sessions
+	user.Sessions = make(map[string]SessionItem)
+	now := time.Now()
+	for k, s := range previousSessions {
+	if s.LastViewed.Add(time.Hour * 24).After(now) {
+	user.Sessions[k] = s
+	}
+	}
+	user.Sessions[cookie] = SessionItem{LastViewed: now, UA: ua}
+	Set(*s.store.DB, userWrp.ID, user)
+	userWrp.Value = user
+
+	return nil, userWrp
+{{ else if eq "IsConnected" .Name }}
+
+	db := *s.store.DB
+
+	userId := session.Get(SessionKeyForUserId).(string)
+
+	userWrp := Get[User](db, userId)
+	if userWrp == nil {
+	return s.accessManager.DefaultRoles["none"].Value
+	}
+
+	cookie := session.ID()
+
+	for k := range userWrp.Value.Sessions {
+	if k == cookie {
+
+	// TODO find the user agent and update user with it.
+	Update(db, userId, func(user *User) {
+	user.Sessions[k] = SessionItem{
+	LastViewed: time.Now(),
+	UA:         "User-Agent",
+	}
+	})
+	return AllFromLinkWrp[User, Role](userWrp)[0].Value
+	}
+	}
+
+	return s.accessManager.DefaultRoles["none"].Value
+{{ else if eq "ActivateAdmin" .Name }}
+
+	if !s.IsFirstLaunch() {
+	return ErrorNotFirstLaunch
+	}
+	if info.Token != s.firstLaunchToken {
+	return ErrorInvalidToken
+	}
+
+	password, _ := bcrypt.GenerateFromPassword([]byte(info.Password), bcrypt.DefaultCost)
+	user := NewUser()
+	user.IsActivated = true
+	user.Password = password
+	user.Email = info.Email
+	adminWrp := Insert(*s.store.DB, user)
+	Link(adminWrp, true, s.accessManager.DefaultRoles["admin"])
+
+	return nil
+{{ else if eq "CreateUser" .Name }}
+
+	db := *s.store.DB
+	if FindFirst(db, func(id string, value *User) bool {
+	return value.Email == info.Email
+	}) != nil {
+	return ErrorUserExist
+	}
+
+	password, _ := bcrypt.GenerateFromPassword([]byte(info.Password), bcrypt.DefaultCost)
+	user := NewUser()
+	user.IsActivated = true
+	user.Password = password
+	user.Firstname = info.Firstname
+	user.Lastname = info.Lastname
+	user.Email = info.Email
+	userWrp := Insert(db, user)
+	Link(userWrp, true, s.accessManager.DefaultRoles["registered"])
+
+	return nil
+{{ else if eq "IsFirstLaunch" .Name }}
+	// Check to see if a user has the "admin" role.
+	return len(VisitWrp[Role, User](s.accessManager.DefaultRoles["admin"])) == 0
 {{ end -}}
 }
 {{ end }}
@@ -53,7 +159,7 @@ func (a *{{ $name }}) {{ .Name }}(
 
 {{ range .ExchangeTypes }}
 
-type ConnectExch struct {
+type {{ .Name }} struct {
 {{ range .Attributes -}}
 	{{ .Name }} {{ .Type }} `mod:"{{ .ModTag }}" validate:"{{ .ValidatorTag}}" json:"{{ .Name | ToLower }}"`
 {{ end -}}

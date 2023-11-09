@@ -3,6 +3,13 @@
 </h1>
 
 <div align="center">
+
+[![GoDoc](https://godoc.org/github.com/phosmachina/Vectra?status.svg)](https://pkg.go.dev/github.com/phosmachina/Vectra#section-documentation)
+[![Go Report Card](https://goreportcard.com/badge/github.com/phosmachina/Vectra)](https://goreportcard.com/badge/github.com/phosmachina/Vectra)
+
+</div>
+
+<div align="center">
 <details>
 <summary>
  Table of contents

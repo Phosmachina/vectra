@@ -38,10 +38,10 @@ const (
 )
 
 const (
-	Copy     = 1 << iota // For demo purpose or something like that.
+	Copy     = 1 << iota // Default content could work as is and could be edited.
 	CorePart             // For the core of Vectra edit with caution.
 	FullGen              // Don't be edited at all.
-	Skeleton             // Body functions to be filled later.
+	Skeleton             // Stub content to be filled or edited later.
 )
 
 type Report struct {
