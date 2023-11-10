@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectTasksOptions" suppressed-tasks="Sass">
+    <TaskOptions isEnabled="true">
+      <option name="arguments" value="run -v .:/vectra phosmachina/sass_scss" />
+      <option name="checkSyntaxErrors" value="true" />
+      <option name="description" />
+      <option name="exitCodeBehavior" value="ERROR" />
+      <option name="fileExtension" value="sass" />
+      <option name="immediateSync" value="true" />
+      <option name="name" value="Sass &amp; SCSS" />
+      <option name="output" value="$ProjectFileDir$/static/css/raw_style.css" />
+      <option name="outputFilters">
+        <array />
+      </option>
+      <option name="outputFromStdout" value="false" />
+      <option name="program" value="docker" />
+      <option name="runOnExternalChanges" value="true" />
+      <option name="scopeName" value="Project Files" />
+      <option name="trackOnlyRoot" value="true" />
+      <option name="workingDir" value="$ProjectFileDir$" />
+      <envs />
+    </TaskOptions>
+    <TaskOptions isEnabled="true">
+      <option name="arguments" value="run -v .:/vectra phosmachina/autoprefixer" />
+      <option name="checkSyntaxErrors" value="true" />
+      <option name="description" />
+      <option name="exitCodeBehavior" value="ERROR" />
+      <option name="fileExtension" value="css" />
+      <option name="immediateSync" value="true" />
+      <option name="name" value="Autoprefixer" />
+      <option name="output" value="$ProjectFileDir$/static/css/autoprefix_style.css" />
+      <option name="outputFilters">
+        <array />
+      </option>
+      <option name="outputFromStdout" value="false" />
+      <option name="program" value="docker" />
+      <option name="runOnExternalChanges" value="true" />
+      <option name="scopeName" value="raw_style.css" />
+      <option name="trackOnlyRoot" value="false" />
+      <option name="workingDir" value="$ProjectFileDir$" />
+      <envs />
+    </TaskOptions>
+    <TaskOptions isEnabled="true">
+      <option name="arguments" value="run -v .:/vectra tdewolff/minify minify --type css /vectra/static/css/autoprefix_style.css -o /vectra/static/css/prod_style.css" />
+      <option name="checkSyntaxErrors" value="true" />
+      <option name="description" />
+      <option name="exitCodeBehavior" value="ERROR" />
+      <option name="fileExtension" value="css" />
+      <option name="immediateSync" value="true" />
+      <option name="name" value="Minify CSS" />
+      <option name="output" value="$ProjectFileDir$static/css/prod_style.css" />
+      <option name="outputFilters">
+        <array />
+      </option>
+      <option name="outputFromStdout" value="false" />
+      <option name="program" value="docker" />
+      <option name="runOnExternalChanges" value="true" />
+      <option name="scopeName" value="autoprefix_style.css" />
+      <option name="trackOnlyRoot" value="false" />
+      <option name="workingDir" value="$ProjectFileDir$" />
+      <envs />
+    </TaskOptions>
+    <TaskOptions isEnabled="true">
+      <option name="arguments" value="run -v .:/vectra tdewolff/minify minify --type js /vectra/static/js/main.js -o /vectra/static/js/prod_main.js" />
+      <option name="checkSyntaxErrors" value="true" />
+      <option name="description" />
+      <option name="exitCodeBehavior" value="ERROR" />
+      <option name="fileExtension" value="js" />
+      <option name="immediateSync" value="true" />
+      <option name="name" value="Minify JS" />
+      <option name="output" value="$ProjectFileDir$/static/js/prod_main.js" />
+      <option name="outputFilters">
+        <array />
+      </option>
+      <option name="outputFromStdout" value="false" />
+      <option name="program" value="docker" />
+      <option name="runOnExternalChanges" value="true" />
+      <option name="scopeName" value="autoprefix_style.css" />
+      <option name="trackOnlyRoot" value="false" />
+      <option name="workingDir" value="$ProjectFileDir$" />
+      <envs />
+    </TaskOptions>
+    <TaskOptions isEnabled="true">
+      <option name="arguments" value="run -v .:/vectra phosmachina/pug jade -writer -pkg view -d /vectra/src/view/go /vectra/$FilePathRelativeToProjectRoot$" />
+      <option name="checkSyntaxErrors" value="true" />
+      <option name="description" />
+      <option name="exitCodeBehavior" value="ERROR" />
+      <option name="fileExtension" value="jade" />
+      <option name="immediateSync" value="true" />
+      <option name="name" value="Pug/Jade" />
+      <option name="output" value="$ProjectFileDir$/src/view/go/$FileName$.go" />
+      <option name="outputFilters">
+        <array />
+      </option>
+      <option name="outputFromStdout" value="false" />
+      <option name="program" value="docker" />
+      <option name="runOnExternalChanges" value="true" />
+      <option name="scopeName" value="Project Files" />
+      <option name="trackOnlyRoot" value="true" />
+      <option name="workingDir" value="$ProjectFileDir$" />
+      <envs />
+    </TaskOptions>
+  </component>
+</project>

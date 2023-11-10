@@ -30,4 +30,4 @@
 
 ## v0.1.0
 
-> First pre-release 
+> First pre-release

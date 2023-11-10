@@ -3,8 +3,8 @@ package i18n
 import (
 	. "Vectra/src/model/service"
 	"Vectra/src/model/storage"
-	"encoding/csv"
 	"fmt"
+	"github.com/go-ini/ini"
 	"os"
 	"path/filepath"
 	"strings"
@@ -56,28 +56,20 @@ func (i *I18n) loadData(path string, lang string, prefix string) error {
 			if err != nil {
 				return err
 			}
-		} else if strings.HasSuffix(key, ".csv") {
+		} else if strings.HasSuffix(key, ".ini") {
 			if _, ok := i.dic[lang]; !ok {
 				i.dic[lang] = make(map[string]string)
 			}
-			fullKey := prefix + strings.TrimSuffix(key, ".csv")
+			fullKey := prefix + strings.TrimSuffix(key, ".ini")
 
 			data, err := os.ReadFile(filepath.Join(path, key))
 			if err != nil {
 				return err
 			}
 
-			reader := csv.NewReader(strings.NewReader(string(data)))
-			records, err := reader.ReadAll()
-			if err != nil {
-				return err
-			}
-
-			for _, record := range records {
-				if len(record) < 2 {
-					continue
-				}
-				i.dic[lang][fullKey+"."+record[0]] = strings.ReplaceAll(record[1], "\\n", "\n")
+			cfg, _ := ini.LoadSources(ini.LoadOptions{}, data)
+			for _, k := range cfg.Section("").Keys() {
+				i.dic[lang][fullKey+"."+k.Name()] = k.Value()
 			}
 		}
 	}

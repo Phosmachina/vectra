@@ -5,12 +5,15 @@ import (
 	"Vectra/src/model/i18n"
 	. "Vectra/src/model/service"
 	. "Vectra/src/model/storage"
+	view "Vectra/src/view/go"
+	"bytes"
 	"errors"
 	"fmt"
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/compress"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/csrf"
 	"github.com/gofiber/fiber/v2/middleware/favicon"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -52,13 +55,22 @@ func main() {
 
 func makeStatic(store *session.Store, hosts map[string]*Host, currentDomain string) {
 	static := fiber.New()
+	static.Use(cors.New())
 	static.Use(compress.New())
+	static.Use(logger.New(logger.Config{Format: "STATIC [${ip}]:${port} ${status} - ${method} ${path}\n"}))
 	static.Use(cache.New(cache.Config{
-		Expiration:   time.Hour * 6,
+		Expiration:   time.Hour * 3 * 24,
 		Storage:      store.Storage,
 		CacheControl: true,
 	}))
-	static.Static("/", "./static")
+	static.Get("sprite", func(ctx *fiber.Ctx) error {
+		var buf = new(bytes.Buffer)
+		view.Jade_sprite(buf)
+		return ctx.Send(buf.Bytes())
+	})
+	static.Static("/", "./static", fiber.Static{
+		Compress: true,
+	})
 	hosts["static."+currentDomain] = &Host{static}
 }
 

@@ -1,8 +1,8 @@
 package storage
 
 import (
-	. "github.com/phosmachina/FluentKV/reldb"
-	. "github.com/phosmachina/FluentKV/reldb/impl"
+	. "github.com/Phosmachina/FluentKV/reldb"
+	. "github.com/Phosmachina/FluentKV/reldb/impl"
 	"gopkg.in/yaml.v3"
 	"log"
 	"os"

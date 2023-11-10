@@ -1,0 +1,28 @@
+#######################
+# Dev information:
+#######################
+
+is_dev: true
+dev_domain: localhost:{{ .DevPort }}
+
+#######################
+# General information:
+#######################
+
+domain: {{ .Domain }}
+tab_prefix: "Vectra | "
+default_lang: {{ .DefaultLang }}
+langs: [ en, fr ]
+
+roles:
+  none: 0
+  registered: 1
+  admin: 2
+
+access_rules:
+  - { target: route, component: /, role: none }
+  - { target: route, component: /init, role: none }
+  - { target: route, component: /login, role: none }
+  - { target: route, component: /sign, role: none }
+  - { target: table, component: User, role: none }
+  - { target: table, component: Role, role: admin }

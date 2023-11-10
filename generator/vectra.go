@@ -92,9 +92,6 @@ var (
 					"ErrorInvalidUserRef",
 				},
 				Methods: []Method{
-					{Name: "IsFirstLaunch",
-						Inputs:  []SimpleAttribute{},
-						Outputs: []string{"bool"}},
 					{Name: "IsConnected",
 						Inputs: []SimpleAttribute{
 							{Name: "session", Type: "*session.Session"},

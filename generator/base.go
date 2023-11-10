@@ -7,6 +7,8 @@ type Base struct {
 func NewBase(cfg *Vectra) *Generator {
 
 	files := []SourceFile{
+		NewDynSourceFile("data/config/configuration.yml.tmpl",
+			"data/config/configuration.yml", Copy),
 		NewSourceFile("static/favicon.ico", Skeleton),
 		NewSourceFile("static/js/main.js", Copy),
 		NewSourceFile("app.go", CorePart),
@@ -25,18 +27,19 @@ func NewBase(cfg *Vectra) *Generator {
 		files = append(files, NewSourceFile("data/i18n/", Copy))
 	}
 	if cfg.WithPugExample {
-		files = append(files, NewSourceFile("src/view/pug/shared/layout.pug", Copy))
-		files = append(files, NewSourceFile("src/view/pug/shared/mixins.pug", Copy))
+		files = append(files, NewSourceFile("src/view/pug/component/", Copy))
+		files = append(files, NewSourceFile("src/view/pug/shared/layout.pug", Skeleton))
+		files = append(files, NewSourceFile("src/view/pug/shared/mixins.pug", Skeleton))
+		files = append(files, NewSourceFile("src/view/pug/shared/sprite.pug", Skeleton))
 		files = append(files, NewSourceFile("src/view/pug/index.pug", Skeleton))
 		files = append(files, NewSourceFile("src/view/pug/init.pug", Copy))
-		files = append(files, NewSourceFile("src/view/pug/login.pug", Skeleton))
+		files = append(files, NewSourceFile("src/view/pug/login.pug", Copy))
 	}
 	if cfg.WithGitignore {
 		files = append(files, NewSourceFile(".gitignore", Copy))
 	}
 	if cfg.WithDockerPipe {
-		files = append(files, NewSourceFile(".pipe/docker-compose.yml", Copy))
-		files = append(files, NewSourceFile(".pipe/Dockerfile", Copy))
+		files = append(files, NewSourceFile(".pipe/", Copy))
 	}
 	if cfg.WithIdeaConfig {
 		files = append(files, NewSourceFile(".idea/", Copy))
@@ -56,6 +59,10 @@ func NewBase(cfg *Vectra) *Generator {
 			"WithDockerPipe",
 			"WithIdeaConfig",
 			"WithDockerDeployment",
+			"ProductionPort",
+			"DevPort",
+			"Domain",
+			"DefaultLang",
 		},
 		Report{
 			Files:   files,
@@ -72,5 +79,8 @@ func NewBase(cfg *Vectra) *Generator {
 func (i *Base) Generate() {
 	i.Generator.Generate(map[string]any{
 		"ProductionPort": i.vectra.ProductionPort,
+		"DevPort":        i.vectra.DevPort,
+		"Domain":         i.vectra.ProductionDomain,
+		"DefaultLang":    i.vectra.DefaultLang,
 	})
 }

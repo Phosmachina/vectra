@@ -1,17 +1,3 @@
-mixin head(ctx)
-    head
-        meta(charset='UTF-8')
-        meta(name='viewport' content='width=device-width, initial-scale=1.0')
-        meta(name='description' content='')
-        link(rel='icon' type='image/png' href=`http://static.${ctx.Domain}/favicon/favicon.ico`)
-        if ctx.IsDev
-            link(rel='stylesheet' href=`http://static.${ctx.Domain}/css/style.css`)
-            script(src=`http://static.${ctx.Domain}/js/main.js`)
-        else
-            link(rel='stylesheet' href=`https://static.${ctx.Domain}/css/mnf-style.css`)
-            script(src=`https://static.${ctx.Domain}/js/mnf-main.js`)
-        title #{ctx.TabTitle}
-
 mixin inputToken()
     label #{i18n.View.Mixin.Label.InputToken}
         input(name='token'

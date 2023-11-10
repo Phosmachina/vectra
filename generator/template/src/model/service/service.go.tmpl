@@ -4,7 +4,7 @@ import (
 . "Vectra/src/model/storage"
 "errors"
 "github.com/gofiber/fiber/v2/middleware/session"
-. "github.com/phosmachina/FluentKV/reldb"
+. "github.com/Phosmachina/FluentKV/reldb"
 "golang.org/x/crypto/bcrypt"
 "time"
 )
@@ -148,9 +148,6 @@ func (s *{{ $name }}) {{ .Name }}(
 	Link(userWrp, true, s.accessManager.DefaultRoles["registered"])
 
 	return nil
-{{ else if eq "IsFirstLaunch" .Name }}
-	// Check to see if a user has the "admin" role.
-	return len(VisitWrp[Role, User](s.accessManager.DefaultRoles["admin"])) == 0
 {{ end -}}
 }
 {{ end }}

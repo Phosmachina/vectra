@@ -4,8 +4,8 @@
 
 <div align="center">
 
-[![GoDoc](https://godoc.org/github.com/phosmachina/Vectra?status.svg)](https://pkg.go.dev/github.com/phosmachina/Vectra#section-documentation)
-[![Go Report Card](https://goreportcard.com/badge/github.com/phosmachina/Vectra)](https://goreportcard.com/badge/github.com/phosmachina/Vectra)
+[![GoDoc](https://godoc.org/github.com/Phosmachina/Vectra?status.svg)](https://pkg.go.dev/github.com/Phosmachina/Vectra#section-documentation)
+[![Go Report Card](https://goreportcard.com/badge/github.com/Phosmachina/Vectra)](https://goreportcard.com/badge/github.com/Phosmachina/Vectra)
 
 </div>
 
@@ -16,13 +16,14 @@
 </summary>
 
 <!-- TOC -->
-
-- [🎯 Overview](#-overview)
-- [⚡️ Features](#️-features)
-- [🚀 Getting started](#-getting-started)
-- [🤝 Contributing](#-contributing)
-- [🕘 What's next](#-whats-next)
-
+  * [🎯 Overview](#-overview)
+  * [⚡️ Features](#-features)
+  * [🚀 Getting started](#-getting-started)
+    * [Prerequisite](#prerequisite)
+    * [Install Vectra](#install-vectra)
+    * [Deploy](#deploy)
+  * [🤝 Contributing](#-contributing)
+  * [🕘 What's next](#-whats-next)
 <!-- TOC -->
 
 </details>
@@ -79,6 +80,36 @@ focus on building the core functionality and design of your website.
 [//]: # (TODO make i18n as an independant library?)
 
 ## 🚀 Getting started
+
+### Prerequisite
+
+- Docker
+
+### Install Vectra
+
+```shell
+go install github.com/Phosmachina/Vectra@latest
+```
+### Deploy
+
+```shell
+vectra -p path/YourProject init
+```
+
+Edit the configuration, `YourProject/.vectra/project.yml`, as your convenience.
+
+Run `vectra` for a full generation:
+```shell
+vectra -p path/YourProject gen
+```
+
+```shell
+{ \
+  docker build -t phosmachina/autoprefixer -f '.pipe/Autoprefixer.Dockerfile' . ;\
+  docker build -t phosmachina/pug -f '.pipe/Pug.Dockerfile' . ;\
+  docker build -t phosmachina/sass_scss -f '.pipe/Sass&SCSS.Dockerfile' . \
+}
+```
 
 ## 🤝 Contributing
 

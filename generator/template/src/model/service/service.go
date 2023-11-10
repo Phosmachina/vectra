@@ -3,7 +3,7 @@ package service
 import (
 	. "Vectra/src/model"
 	. "Vectra/src/model/storage"
-	. "github.com/phosmachina/FluentKV/reldb"
+	. "github.com/Phosmachina/FluentKV/reldb"
 	"io"
 	"log"
 	"os"
@@ -13,12 +13,6 @@ import (
 var (
 	lock = &sync.Mutex{}
 )
-
-type Service interface {
-	GetStore() *Storage
-	GetAccessManager() *AccessManager
-	IsFirstLaunch() bool
-}
 
 type service struct {
 	store            *Storage
@@ -44,7 +38,8 @@ func (s *service) GetAccessManager() *AccessManager {
 }
 
 func (s *service) IsFirstLaunch() bool {
-	return s.IsFirstLaunch()
+	// Check to see if a user has the "admin" role.
+	return len(VisitWrp[Role, User](s.accessManager.DefaultRoles["admin"])) == 0
 }
 
 // checkAppToken if is the first launch, the initialization token will be generated and write in file.

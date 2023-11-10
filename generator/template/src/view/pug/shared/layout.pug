@@ -16,12 +16,20 @@ html(lang=`${ctx.Lang}`)
         meta(name='viewport' content='initial-scale=1.0')
         meta(name='description' content='')
         link(rel='icon' type='image/png' href=`http://static.${ctx.Domain}/favicon.ico`)
-        link(rel='stylesheet' href=`http://static.${ctx.Domain}/css/style.css`)
-        script(src=`http://static.${ctx.Domain}/js/main.js`)
+        if ctx.IsDev
+            link(rel='stylesheet' href=`http://static.${ctx.Domain}/css/autoprefix_style.css`)
+            script(src=`http://static.${ctx.Domain}/js/main.js`)
+        else
+            link(rel='stylesheet' href=`http://static.${ctx.Domain}/css/prod_style.css`)
+            script(src=`http://static.${ctx.Domain}/js/prod_main.js`)
 
         title #{ctx.TabTitle}
 
     body
+
+        svg#svg-sprite(style='height: 0')
+
+
         header
             div(class='container')
                 block header
