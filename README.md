@@ -5,11 +5,10 @@
 <div align="center">
 
 [![GoDoc](https://godoc.org/github.com/Phosmachina/Vectra?status.svg)](https://pkg.go.dev/github.com/Phosmachina/Vectra#section-documentation)
-[![Go Report Card](https://goreportcard.com/badge/github.com/Phosmachina/Vectra)](https://goreportcard.com/badge/github.com/Phosmachina/Vectra)
+[![Go Report Card](https://goreportcard.com/badge/github.com/Phosmachina/Vectra)](https://goreportcard.com/report/github.com/Phosmachina/Vectra)
 
 </div>
 
-<div align="center">
 <details>
 <summary>
  Table of contents
@@ -22,28 +21,27 @@
     * [Prerequisite](#prerequisite)
     * [Install Vectra](#install-vectra)
     * [Deploy](#deploy)
+    * [Run](#run)
   * [🤝 Contributing](#-contributing)
   * [🕘 What's next](#-whats-next)
 <!-- TOC -->
 
 </details>
-</div>
 
 ## 🎯 Overview
 
 The main goal of the project is to create a versatile multi-language template and toolkit
 for website servers and backend systems. It strives to achieve this by integrating the
-best existing technologies, resulting in an efficient and fast server experience. The 
-goal is to minimize the complexity of development as much as possible. Ultimately, 
-Vectra's goal is to leverage the unique design of each technology to achieve specific 
+best existing technologies, resulting in an efficient and fast server experience. The
+goal is to minimize the complexity of development as much as possible. Ultimately,
+Vectra's goal is to leverage the unique design of each technology to achieve specific
 goals without investing excessive time and effort.
 
-<img src="docs/technologies.svg" width="100%" height="750px" alt="technologies overview">
+[//]: # (<img src="docs/technologies.svg" width="100%" height="750px" alt="technologies overview">)
 
 By combining these technologies, Vectra offers a robust and streamlined development
 environment. It reduces the need for complex setups and integrations, allowing you to
 focus on building the core functionality and design of your website.
-
 
 ## ⚡️ Features
 
@@ -84,31 +82,57 @@ focus on building the core functionality and design of your website.
 ### Prerequisite
 
 - Docker
+- Go SDK (or build and run in Docker)
 
 ### Install Vectra
 
+If you are Go SDK, install with `go` command:
+
 ```shell
-go install github.com/Phosmachina/Vectra@latest
+go install github.com/Phosmachina/Vectra@v1.0.0
 ```
+
 ### Deploy
 
-```shell
-vectra -p path/YourProject init
-```
+- This command permits writing a default config:
+  ```shell
+  vectra -p path/YourProject init
+  ```
 
-Edit the configuration, `YourProject/.vectra/project.yml`, as your convenience.
+- Edit the configuration, `YourProject/.vectra/project.yml`, as your convenience.
 
-Run `vectra` for a full generation:
-```shell
-vectra -p path/YourProject gen
-```
+- Run `vectra` for a full generation:
+  ```shell
+  vectra -p path/YourProject gen
+  ```
+
+- Build and pull the necessary images for file watchers (in the root directory of the
+  project):
+  ```shell
+  { \
+    docker build -t phosmachina/autoprefixer -f '.pipe/Autoprefixer.Dockerfile' . ;\
+    docker build -t phosmachina/pug -f '.pipe/Pug.Dockerfile' . ;\
+    docker build -t phosmachina/sass_scss -f '.pipe/Sass&SCSS.Dockerfile' . \
+    docker pull tdewolff/minify \
+  }
+  ```
+
+### Run
+
+Now you can open the folder `path/YourProject`, which Vectra created as a project with
+your IDE.
+
+You need to make sure that the `*.pug` files are correctly transpiled to Go (there are 
+transpiled to `src/view/go/`).
+Currently, with the file watchers in Jetbrains IDEs, you need to make a change to the
+files to trigger it.
+
+After that, you can start your application.
+This can be done manually by executing the following command (in the root directory of the
+project):
 
 ```shell
-{ \
-  docker build -t phosmachina/autoprefixer -f '.pipe/Autoprefixer.Dockerfile' . ;\
-  docker build -t phosmachina/pug -f '.pipe/Pug.Dockerfile' . ;\
-  docker build -t phosmachina/sass_scss -f '.pipe/Sass&SCSS.Dockerfile' . \
-}
+go run app.go
 ```
 
 ## 🤝 Contributing
