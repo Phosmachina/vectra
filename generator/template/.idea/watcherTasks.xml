@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="ProjectTasksOptions" suppressed-tasks="Sass">
+  <component name="ProjectTasksOptions" suppressed-tasks="Sass;SCSS">
     <TaskOptions isEnabled="true">
       <option name="arguments" value="run -v .:/vectra phosmachina/sass_scss" />
       <option name="checkSyntaxErrors" value="true" />
       <option name="description" />
       <option name="exitCodeBehavior" value="ERROR" />
-      <option name="fileExtension" value="sass" />
+      <option name="fileExtension" value="*" />
       <option name="immediateSync" value="true" />
       <option name="name" value="Sass &amp; SCSS" />
       <option name="output" value="$ProjectFileDir$/static/css/raw_style.css" />
@@ -16,7 +16,7 @@
       <option name="outputFromStdout" value="false" />
       <option name="program" value="docker" />
       <option name="runOnExternalChanges" value="true" />
-      <option name="scopeName" value="Project Files" />
+      <option name="scopeName" value="Sass &amp; SCSS" />
       <option name="trackOnlyRoot" value="true" />
       <option name="workingDir" value="$ProjectFileDir$" />
       <envs />
@@ -88,7 +88,7 @@
       <option name="exitCodeBehavior" value="ERROR" />
       <option name="fileExtension" value="jade" />
       <option name="immediateSync" value="true" />
-      <option name="name" value="Pug/Jade" />
+      <option name="name" value="Pug" />
       <option name="output" value="$ProjectFileDir$/src/view/go/$FileName$.go" />
       <option name="outputFilters">
         <array />
@@ -96,7 +96,7 @@
       <option name="outputFromStdout" value="false" />
       <option name="program" value="docker" />
       <option name="runOnExternalChanges" value="true" />
-      <option name="scopeName" value="Project Files" />
+      <option name="scopeName" value="Pug" />
       <option name="trackOnlyRoot" value="true" />
       <option name="workingDir" value="$ProjectFileDir$" />
       <envs />

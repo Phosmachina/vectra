@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Pug" pattern="file[VectraDeployTest]:src/view/pug//*&amp;&amp;!file:src/view/pug/shared/i18n_completion_variables.pug" />
+</component>
