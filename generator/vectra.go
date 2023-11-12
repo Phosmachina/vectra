@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"strings"
+	"time"
 )
 
 var (
@@ -156,6 +157,7 @@ type Vectra struct {
 	generators  map[string]IGenerator `yaml:"-"`
 	ProjectPath string                `yaml:"-"`
 
+	ProjectName          string                        `yaml:"project_name"`
 	DefaultLang          string                        `yaml:"default_lang"`
 	DevPort              int                           `yaml:"dev_port"`
 	ProductionPort       int                           `yaml:"production_port"`
@@ -183,6 +185,7 @@ func NewVectra(projectPath string) *Vectra {
 	))
 	if err != nil {
 		vectra = defaultVectra
+		vectra.ProjectName = filepath.Base(projectPath)
 	}
 	if yaml.Unmarshal(data, &vectra) != nil {
 		vectra = defaultVectra
@@ -207,6 +210,87 @@ func generatorsToMap(g ...*Generator) map[string]IGenerator {
 	}
 
 	return m
+}
+
+func (v *Vectra) Watch() {
+
+	fmt.Println("========= Check docker =========")
+
+	if IsDockerInstalled() {
+		fmt.Println("Docker is correctly installed.")
+	} else {
+		fmt.Println("Docker is not correctly installed.")
+		return
+	}
+
+	images := []string{"Autoprefixer", "Pug", "Sass", "MinifyJS", "MinifyCSS"}
+	for _, image := range images {
+		imageName := "phosmachina/" + strings.ToLower(image)
+		err := CreateDockerImage(image+".Dockerfile",
+			imageName)
+		if err != nil {
+			fmt.Println("Failed to create image: " + image)
+			return
+		}
+		containerName := v.ProjectName + "_" + image
+		err = CreateDockerContainer(containerName, v.ProjectPath, imageName)
+		if err != nil {
+			fmt.Println("Failed to create container: " + containerName)
+			return
+		}
+		err = StartDockerContainer(containerName)
+		if err != nil {
+			fmt.Println("Failed to start container: " + containerName)
+			return
+		}
+	}
+
+	fmt.Println("=========   Watching   =========")
+
+	go WatchFiles(filepath.Join(v.ProjectPath, "src", "view", "pug"),
+		[]string{".*\\.pug$"},
+		[]string{".*completion_variable.*"},
+		2, func(pth string) {
+			fmt.Print("PUG ", pth, " | ")
+			rel, _ := filepath.Rel(v.ProjectPath, pth)
+			c := fmt.Sprintf(
+				"docker exec %s jade -writer -pkg view -d /vectra/src/view/go /vectra/%s",
+				v.ProjectName+"_Pug",
+				rel,
+			)
+			_ = ExecuteCommand(c, false, true)
+			fmt.Println("Transpile DONE.")
+		},
+	)
+
+	go WatchFiles(filepath.Join(v.ProjectPath, "static", "js"),
+		[]string{"main.js"},
+		[]string{"prod"},
+		2, func(pth string) {
+			fmt.Print("JS ", pth, " | ")
+			_ = ExecuteCommand(fmt.Sprintf(
+				"docker start %s_MinifyJS", v.ProjectName), false, true)
+			fmt.Println("Minify DONE.")
+		},
+	)
+
+	WatchFiles(filepath.Join(v.ProjectPath, "static", "css"),
+		[]string{".*\\.sass$", ".*\\.scss$"},
+		[]string{},
+		1, func(pth string) {
+			fmt.Print("CSS ", pth, " | ")
+			_ = ExecuteCommand(
+				fmt.Sprintf("docker start %s_Sass", v.ProjectName), false, true)
+			fmt.Print("Sass DONE, ")
+			_ = ExecuteCommand(
+				fmt.Sprintf("docker start %s_Autoprefixer", v.ProjectName), false, true)
+			fmt.Print("Autoprefixer DONE, ")
+			time.Sleep(200 * time.Millisecond)
+			_ = ExecuteCommand(
+				fmt.Sprintf("docker start %s_MinifyCSS", v.ProjectName), false, true)
+			fmt.Println("Minify DONE.")
+		},
+	)
 }
 
 func (v *Vectra) Init() {
@@ -276,6 +360,15 @@ func (v *Vectra) GetFieldsAsMap(paths []string) map[string]any {
 	return result
 }
 
+func (v *Vectra) DeserializeFromMap(data map[string]any) error {
+	for path, value := range data {
+		if err := v.setField(path, value); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (v *Vectra) setField(path string, value any) error {
 	fields := strings.Split(path, ".")
 	current := reflect.ValueOf(v).Elem()
@@ -315,14 +408,5 @@ func (v *Vectra) setField(path string, value any) error {
 		}
 	}
 
-	return nil
-}
-
-func (v *Vectra) DeserializeFromMap(data map[string]any) error {
-	for path, value := range data {
-		if err := v.setField(path, value); err != nil {
-			return err
-		}
-	}
 	return nil
 }

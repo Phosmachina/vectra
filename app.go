@@ -104,11 +104,10 @@ func main() {
 			},
 		},
 		{
-			Name:  "update",
-			Usage: "Update Vectra project",
+			Name:  "watch",
+			Usage: "Survey Sass, Pug files of Vectra project and execute pipeline.",
 			Action: func(c *cli.Context) error {
-				log.Println("Updating Vectra project")
-				// Add update logic here
+				vectra.Watch()
 				return nil
 			},
 		},

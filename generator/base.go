@@ -38,12 +38,6 @@ func NewBase(cfg *Vectra) *Generator {
 	if cfg.WithGitignore {
 		files = append(files, NewSourceFile(".gitignore", Copy))
 	}
-	if cfg.WithDockerPipe {
-		files = append(files, NewSourceFile(".pipe/", Copy))
-	}
-	if cfg.WithIdeaConfig {
-		files = append(files, NewSourceFile(".idea/", Copy))
-	}
 	if cfg.WithDockerDeployment {
 		files = append(files, NewDynSourceFile("docker-compose.yml.tmpl", "docker-compose.yml", Copy))
 		files = append(files, NewDynSourceFile("Dockerfile.tmpl", "Dockerfile", Copy))
@@ -56,8 +50,6 @@ func NewBase(cfg *Vectra) *Generator {
 			"WithI18nExample",
 			"WithPugExample",
 			"WithGitignore",
-			"WithDockerPipe",
-			"WithIdeaConfig",
 			"WithDockerDeployment",
 			"ProductionPort",
 			"DevPort",
