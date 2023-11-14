@@ -1,13 +1,15 @@
 extends shared/layout
 
-block header
-
 block content
+
     h1 Login
-    form(ajax-func='login')
-        +inputEmail
-        +inputRequestPassword
-        input(type='submit' value="Login")
 
-block footer
+    .login-block
+        form(ajax-func='login')
+            +inputEmail
+            +inputRequestPassword
 
+            button.button(type='submit')
+                div
+                    p Login
+                    +svg-arrow-right

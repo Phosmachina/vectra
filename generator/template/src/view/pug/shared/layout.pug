@@ -1,6 +1,7 @@
 :go:func(arg) ctx GlobalCtx
 
 include mixins
+include ../component/all
 
 -
     var _i18n = i18n.GetInstance().Get
@@ -9,7 +10,7 @@ include mixins
 
 doctype 5
 
-html(lang=`${ctx.Lang}`)
+html.theme-dark(lang=`${ctx.Lang}`)
 
     head
         meta(charset='UTF-8')
@@ -20,8 +21,8 @@ html(lang=`${ctx.Lang}`)
             link(rel='stylesheet' href=`http://static.${ctx.Domain}/css/autoprefix_style.css`)
             script(src=`http://static.${ctx.Domain}/js/main.js`)
         else
-            link(rel='stylesheet' href=`http://static.${ctx.Domain}/css/prod_style.css`)
-            script(src=`http://static.${ctx.Domain}/js/prod_main.js`)
+            link(rel='stylesheet' href=`https://static.${ctx.Domain}/css/prod_style.css`)
+            script(src=`https://static.${ctx.Domain}/js/prod_main.js`)
 
         title #{ctx.TabTitle}
 
@@ -29,36 +30,58 @@ html(lang=`${ctx.Lang}`)
 
         svg#svg-sprite(style='height: 0')
 
-
         header
-            div(class='container')
+            .container
                 block header
+                    .header
+                        +svg-vectra-banner
+                        .conf
+                            #lang-switcher
+                                button(onclick="toggleLang(this)")
+                                    p #{ctx.Lang}
+                                    +svg-flag-en
+                                .popup
+                                    each lang in ctx.Langs
+                                        if lang != ctx.Lang
+                                            button(onclick="toggleLang(this)")
+                                                p #{lang}
+                                                case lang
+                                                    when 'fr'
+                                                        +svg-flag-fr
+                                                    when 'en'
+                                                        +svg-flag-en
 
-        div(id='content')
-
-            div(class='container')
-
-                template(id='modalYesCancel')
-                    div(class='modal')
-                        div( class='modal-content')
+                            button#theme-switcher(onclick="toggleTheme()")
+                                div
+                                    +svg-icon-theme-dark
+                                .hidden
+                                    +svg-icon-theme-light
+        #content
+            .container
+                template#modalYesCancel
+                    .modal
+                        .modal-content
                             span(name='message')
-                            div(class="row")
-                                button( name='ok')
-                                button( name='cancel') Annuler
+                            .row
+                                button.button(name='ok')
+                                button.button(name='cancel')
+                                    div Annuler
 
-                template(id='notification')
-                    div(class='notification')
+                template#notification
+                    .notification
                         span
                         span &#10539;
 
-                template(id='advice')
-                    div(class='advice')
+                template#advice
+                    .advice
 
-                div(id='notification-group')
-
+                #notification-group
 
                 block content
 
         footer
-            div(class='container')
+            .container
                 block footer
+                    .footer
+                        p © Phosmachina
+                        p. Built with ❤️ on top of #[a(href='https://github.com/Phosmachina/Vectra') Vectra]

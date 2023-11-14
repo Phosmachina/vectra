@@ -21,8 +21,6 @@ var (
 		WithI18nExample:      true,
 		WithSassExample:      true,
 		WithPugExample:       true,
-		WithIdeaConfig:       true,
-		WithDockerPipe:       true,
 		StorageTypes: []VectraType[SimpleAttribute]{
 			{Name: "Role", Attributes: []SimpleAttribute{
 				{Name: "Name", Type: "string"},
@@ -42,6 +40,7 @@ var (
 					{Name: "Domain", Type: "string"},
 					{Name: "TabTitle", Type: "string"},
 					{Name: "Lang", Type: "string"},
+					{Name: "Langs", Type: "[]string"},
 					{Name: "User", Type: "UserCtx"},
 				}},
 				{Name: "UserCtx", Attributes: []SimpleAttribute{
@@ -78,6 +77,7 @@ var (
 				Routes: []Route{
 					{Kind: "Post", Path: "/activate/admin", Target: "activateAdmin"},
 					{Kind: "Post", Path: "/login", Target: "login"},
+					{Kind: "Post", Path: "/update/lang", Target: "updateLang"},
 				},
 			},
 		},
@@ -143,6 +143,10 @@ var (
 						{SimpleAttribute: SimpleAttribute{Name: "Email", Type: "string"},
 							ModTag: "trim,lcase", ValidatorTag: "required,email"},
 					}},
+					{Name: "LangExch", Attributes: []AttributeWithTag{
+						{SimpleAttribute: SimpleAttribute{Name: "Lang", Type: "string"},
+							ModTag: "trim,lcase", ValidatorTag: "required"},
+					}},
 					{Name: "ReasonExch", Attributes: []AttributeWithTag{
 						{SimpleAttribute: SimpleAttribute{Name: "Reason", Type: "string"},
 							ModTag: "", ValidatorTag: ""},
@@ -167,8 +171,6 @@ type Vectra struct {
 	WithI18nExample      bool                          `yaml:"with_i18n_example"`
 	WithSassExample      bool                          `yaml:"with_sass_example"`
 	WithPugExample       bool                          `yaml:"with_pug_example"`
-	WithIdeaConfig       bool                          `yaml:"with_idea_config"`
-	WithDockerPipe       bool                          `yaml:"with_docker_pipe"`
 	StorageTypes         []VectraType[SimpleAttribute] `yaml:"storage_types"`
 	ViewTypes            ViewTypes                     `yaml:"view_types"`
 	Controllers          []Controller                  `yaml:"controllers"`

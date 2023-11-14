@@ -5,6 +5,7 @@
 /data/db/
 /data/config/init-token
 
-/static/js/mnf-*
-/static/css/*css*
+/static/css/raw_style.css
 /static/css/.sass-cache/
+
+*.gz

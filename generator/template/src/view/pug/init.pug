@@ -1,15 +1,18 @@
 extends shared/layout
 
-block header
-
 block content
+
     h1 Configuration du compte administrateur
 
-    form(ajax-func='initRequest')
-        +inputEmail
-        +inputNewPassword
-        +inputRepeatPassword
-        +inputToken
-        input(type='submit' value="Créer l'administrateur")
+    .init-block
+        form(ajax-func='initRequest')
+            +inputEmail
+            +inputNewPassword
+            +inputRepeatPassword
+            +inputToken
 
-block footer
+            button.button(type='submit')
+                div
+                    p Create Admin account
+                    +svg-arrow-right
+

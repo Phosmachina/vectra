@@ -1,0 +1,24 @@
+
+a
+    background: linear-gradient(100deg, var(--grad-2-accent-1) 30.78%, var(--grad-2-accent-2) 68.8%, var(--grad-2-accent-3) 106.83%)
+    background-clip: text
+    -webkit-text-fill-color: transparent
+    text-decoration: none
+    position: relative
+
+    &::before
+        content: ''
+        position: absolute
+        bottom: 0
+        right: 0
+        width: 0
+        height: 2px
+        background: linear-gradient(100deg, var(--grad-2-accent-1) 30.78%, var(--grad-2-accent-2) 68.8%, var(--grad-2-accent-3) 106.83%)
+        transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1)
+
+    @media (hover: hover) and (pointer: fine)
+
+    &:hover::before
+        left: 0
+        right: auto
+        width: 100%

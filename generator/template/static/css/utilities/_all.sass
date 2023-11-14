@@ -1,0 +1,12 @@
+@charset "utf-8"
+
+@import themes
+@import mixins
+
+// Generate theme classes and variables
+@each $theme, $colors in $themes
+    // Generate theme class
+    .theme-#{$theme}
+        @each $color, $value in $colors
+            // Generate CSS variables for each color in the theme
+            --#{$color}: #{$value}

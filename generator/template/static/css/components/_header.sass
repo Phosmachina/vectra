@@ -1,0 +1,60 @@
+
+header
+    margin-bottom: 30px
+
+    .header
+        display: flex
+        justify-content: space-between
+        padding: 30px 0
+        border-bottom: 1px solid var(--border)
+
+    .conf
+        display: flex
+        align-items: center
+        justify-self: left
+        gap: 10px
+
+        #lang-switcher
+            &:hover .popup
+                opacity: 1
+                animation: fadeIn 200ms ease
+
+            .popup
+                background-color: var(--background-luma-1)
+                border-radius: 10px
+                position: absolute
+                z-index: 1
+                transform-origin: top
+                opacity: 0
+
+            button
+                width: 72px
+                display: flex
+                justify-content: space-between
+                align-items: center
+                font-size: 14px
+                text-transform: uppercase
+                background: transparent
+                padding: 10px 8px
+                border: none
+                border-radius: 10px
+                transition: background 200ms ease
+
+                &:hover
+                    cursor: pointer
+                    background: var(--background-luma-3)
+
+        #theme-switcher
+            padding: 4px
+            border: none
+            border-radius: 10px
+            transition: background 200ms ease
+            background-color: transparent
+
+
+            &:hover
+                cursor: pointer
+                background: var(--background-luma-3)
+
+            svg
+                fill: var(--text)

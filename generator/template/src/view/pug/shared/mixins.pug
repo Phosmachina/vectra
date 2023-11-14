@@ -1,5 +1,5 @@
 mixin inputToken()
-    label #{i18n.View.Mixin.Label.InputToken}
+    label #{i18n.View.Mixin.Label.InputToken()}
         input(name='token'
             type='text'
             validation-0='validateInitToken'
@@ -7,7 +7,7 @@ mixin inputToken()
         div(class='advice-group')
 
 mixin inputFirstname()
-    label #{i18n.View.Mixin.Label.InputFirstname}
+    label #{i18n.View.Mixin.Label.InputFirstname()}
         input(name='firstname'
             type='text'
             autocomplete='given-name'
@@ -17,7 +17,7 @@ mixin inputFirstname()
         div(class='advice-group')
 
 mixin inputLastname()
-    label #{i18n.View.Mixin.Label.InputLastname}
+    label #{i18n.View.Mixin.Label.InputLastname()}
         input(name='firstname'
             type='text'
             autocomplete='family-name'

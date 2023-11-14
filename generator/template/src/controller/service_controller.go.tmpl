@@ -53,6 +53,17 @@ func (c {{ $name }}Controller) {{ .Target }}(ctx *fiber.Ctx) error {
     sess.Save()
     },
     )
+{{ else if eq "updateLang" .Target }}
+    return HandleRequest(
+    ctx,
+    func(t LangExch) (error, *ObjWrapper[IObject]) {
+    GetApiV1().GetStore().Config.CurrentLang = t.Lang
+    return nil, nil
+    },
+    nil,
+    )
+{{ else }}
+    return nil
 {{ end -}}
 }
 

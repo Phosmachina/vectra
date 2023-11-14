@@ -1,0 +1,64 @@
+
+form
+    display: flex
+    flex-direction: column
+    gap: 15px
+
+input
+    appearance: none
+    padding: 5px 18px
+    min-width: 250px
+    outline: none
+    background: var(--background-luma-2)
+    border-radius: 11px
+    color: var(--text)
+    border: none
+    width: 100%
+    height: 100%
+
+    transition: background 0.2s ease-out
+
+    &:focus
+        box-shadow: none
+        background: var(--background-luma-1)
+
+label
+    color: var(--text)
+    display: flex
+    flex: auto
+    flex-direction: column
+    gap: 10px
+
+    > div:nth-child(1)
+        display: grid
+        place-items: center
+
+        border-radius: 14px
+        min-width: 264px
+        height: 30px
+        padding: 2px
+        background: linear-gradient(99.88deg, var(--grad-1-accent-1) 6.29%, var(--grad-1-accent-2) 37.11%, var(--grad-1-accent-3) 67.92%, var(--grad-1-accent-4) 98.74%), linear-gradient(0deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25))
+
+select
+    appearance: none
+    border: 0
+    outline: 0
+    width: 100%
+    height: 100%
+    border-radius: 11px
+    color: var(--text)
+    padding: 0 10px
+    cursor: pointer
+
+    option
+        background: var(--background-luma-2)
+
+.advice-group
+    display: flex
+    flex-flow: wrap
+    gap: 5px
+
+.advice
+    color: var(--text-advice)
+    flex: 1 1 auto
+

@@ -32,8 +32,9 @@ func {{ .Name }} (
 	ctx := GlobalCtx{
 		IsDev:    config.IsDev,
 		TabTitle: config.TabPrefix + tabSuffix,
-		Lang:     config.DefaultLang,
 		User:     newUserCtx(userId),
+		Lang:     config.DefaultLang,
+		Langs:     config.Langs,
 	}
 
 	if ctx.IsDev {

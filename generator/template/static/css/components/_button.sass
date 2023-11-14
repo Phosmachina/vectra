@@ -1,0 +1,62 @@
+@import "../utilities/mixins"
+
+$border: 2px
+$font-size: 14px
+$height: $font-size * 3
+
+.button
+    font-size: $font-size
+    text-decoration: none
+    color: var(--background)
+    display: inline-flex
+    position: relative
+    padding: 0 7px
+    background-image: linear-gradient(100deg, var(--grad-2-accent-1) 30.78%, var(--grad-2-accent-3) 68.8%, var(--grad-2-accent-3) 106.83%)
+    height: $height
+    border-radius: calc($height / 2)
+    border: none
+    align-items: center
+    transition: background-position 0.2s ease-out
+    cursor: pointer
+
+    +unselectable
+
+    svg
+        stroke: var(--text)
+        fill: var(--text)
+
+    &:before
+        content: ''
+        position: absolute
+        left: $border
+        top: $border
+        right: $border
+        bottom: $border
+        background: var(--background)
+        border-radius: calc($height / 2)
+        transition: background 0.2s ease-out
+
+    > div
+        display: flex
+        align-items: center
+        gap: 5px
+        flex-grow: 1
+        justify-content: space-evenly
+        z-index: 2
+        background: linear-gradient(100deg, var(--grad-2-accent-1) 30.78%, var(--grad-2-accent-3) 68.8%, var(--grad-2-accent-3) 106.83%)
+        background-clip: text
+        -webkit-background-clip: text
+
+
+    &:hover
+        background: linear-gradient(100deg, var(--grad-2-accent-1) 30.78%, var(--grad-2-accent-3) 68.8%, var(--grad-2-accent-3) 106.83%)
+
+        > div
+            -webkit-text-fill-color: var(--background)
+
+        &:before
+            background: rgba(255, 255, 255, 0)
+
+        svg
+            stroke: var(--background)
+            fill: var(--background)

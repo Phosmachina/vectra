@@ -32,14 +32,15 @@ function loadSvgSprite() {
 }
 
 function loadSystemTheme() {
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        // dark mode
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+        toggleTheme()
     }
 
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-        const newColorScheme = event.matches ? "dark" : "light";
+        const newColorScheme = event.matches ? "dark" : "light"
+        document.querySelector("html").className = `theme-${newColorScheme}`
 
-    });
+    })
 }
 
 const handleInput = (labels, idxLabel) => {
@@ -281,6 +282,25 @@ function adminLogin() {
 
 //endregion
 
+//region BUTTONS
+
+function toggleTheme() {
+    let htmlTag = document.querySelector("html")
+    htmlTag.className = htmlTag.classList.contains("theme-dark") ? "theme-light" : "theme-dark"
+
+    document.querySelectorAll("#theme-switcher div")
+        .forEach(blk => blk.classList.toggle("hidden"))
+}
+
+function toggleLang(btn) {
+    let lang = btn.querySelector("p").innerText;
+    simpleFetch("/api/v1/update/lang",new Map([["lang", lang]]) )
+        .then(() => document.location.reload())
+        .catch()
+}
+
+//endregion
+
 //region HELPERS
 
 /**
@@ -371,8 +391,3 @@ function newNotification(msg, type) {
 }
 
 //endregion
-
-
-function test() {
-    newNotification("My best info for today.", NOTIFICATION_TYPE.INFO)
-}
