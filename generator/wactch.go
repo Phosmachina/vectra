@@ -76,7 +76,7 @@ func CreateDockerContainer(containerName, projectPath, imageName string) error {
 		fmt.Printf("Container %s exists.\n", containerName)
 		return nil
 	}
-	// Create new Docker container
+	// Create a new Docker container
 	fullPathOfProject, _ := filepath.Abs(projectPath)
 	command = fmt.Sprintf("docker create --name=%s -v '%s:/vectra' %s", containerName,
 		fullPathOfProject, imageName)
@@ -149,7 +149,7 @@ func WatchFiles(rootFolder string, includePatterns, excludePatterns []string, de
 	}
 
 	go func() {
-		timer := time.NewTimer(time.Duration(delay) * time.Second)
+		timer := time.NewTimer(time.Duration(delay) * time.Millisecond)
 
 		for {
 			select {
@@ -181,7 +181,7 @@ func WatchFiles(rootFolder string, includePatterns, excludePatterns []string, de
 
 				if include && !exclude && event.Op&fsnotify.Write == fsnotify.Write {
 					timer.Stop()
-					timer = time.AfterFunc(time.Duration(delay)*time.Second, func() {
+					timer = time.AfterFunc(time.Duration(delay)*time.Millisecond, func() {
 						task(filePath)
 					})
 				}

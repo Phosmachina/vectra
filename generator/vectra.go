@@ -252,7 +252,7 @@ func (v *Vectra) Watch() {
 	go WatchFiles(filepath.Join(v.ProjectPath, "src", "view", "pug"),
 		[]string{".*\\.pug$"},
 		[]string{".*completion_variable.*"},
-		2, func(pth string) {
+		50, func(pth string) {
 			fmt.Print("PUG ", pth, " | ")
 			rel, _ := filepath.Rel(v.ProjectPath, pth)
 			c := fmt.Sprintf(
@@ -268,7 +268,7 @@ func (v *Vectra) Watch() {
 	go WatchFiles(filepath.Join(v.ProjectPath, "static", "js"),
 		[]string{"main.js"},
 		[]string{"prod"},
-		2, func(pth string) {
+		200, func(pth string) {
 			fmt.Print("JS ", pth, " | ")
 			_ = ExecuteCommand(fmt.Sprintf(
 				"docker start %s_MinifyJS", v.ProjectName), false, true)
@@ -279,7 +279,7 @@ func (v *Vectra) Watch() {
 	WatchFiles(filepath.Join(v.ProjectPath, "static", "css"),
 		[]string{".*\\.sass$", ".*\\.scss$"},
 		[]string{},
-		1, func(pth string) {
+		200, func(pth string) {
 			fmt.Print("CSS ", pth, " | ")
 			_ = ExecuteCommand(
 				fmt.Sprintf("docker start %s_Sass", v.ProjectName), false, true)
@@ -287,7 +287,7 @@ func (v *Vectra) Watch() {
 			_ = ExecuteCommand(
 				fmt.Sprintf("docker start %s_Autoprefixer", v.ProjectName), false, true)
 			fmt.Print("Autoprefixer DONE, ")
-			time.Sleep(200 * time.Millisecond)
+			time.Sleep(400 * time.Millisecond)
 			_ = ExecuteCommand(
 				fmt.Sprintf("docker start %s_MinifyCSS", v.ProjectName), false, true)
 			fmt.Println("Minify DONE.")
