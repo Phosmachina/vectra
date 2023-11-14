@@ -15,15 +15,17 @@
 </summary>
 
 <!-- TOC -->
-  * [🎯 Overview](#-overview)
-  * [⚡️ Features](#-features)
-  * [🚀 Getting started](#-getting-started)
+
+* [🎯 Overview](#-overview)
+* [⚡️ Features](#-features)
+* [🚀 Getting started](#-getting-started)
     * [Prerequisite](#prerequisite)
     * [Install Vectra](#install-vectra)
     * [Deploy](#deploy)
     * [Run](#run)
-  * [🤝 Contributing](#-contributing)
-  * [🕘 What's next](#-whats-next)
+* [🤝 Contributing](#-contributing)
+* [🕘 What's next](#-whats-next)
+
 <!-- TOC -->
 
 </details>
@@ -106,15 +108,10 @@ go install github.com/Phosmachina/Vectra@v1.0.0
   vectra -p path/YourProject gen
   ```
 
-- Build and pull the necessary images for file watchers (in the root directory of the
-  project):
+- Launch watcher: The first time it might take some time because of container
+  creation and image download:
   ```shell
-  { \
-    docker build -t phosmachina/autoprefixer -f '.pipe/Autoprefixer.Dockerfile' . ;\
-    docker build -t phosmachina/pug -f '.pipe/Pug.Dockerfile' . ;\
-    docker build -t phosmachina/sass_scss -f '.pipe/Sass&SCSS.Dockerfile' . \
-    docker pull tdewolff/minify \
-  }
+  vectra -p path/YourProject watch
   ```
 
 ### Run
@@ -122,7 +119,7 @@ go install github.com/Phosmachina/Vectra@v1.0.0
 Now you can open the folder `path/YourProject`, which Vectra created as a project with
 your IDE.
 
-You need to make sure that the `*.pug` files are correctly transpiled to Go (there are 
+You need to make sure that the `*.pug` files are correctly transpiled to Go (there are
 transpiled to `src/view/go/`).
 Currently, with the file watchers in Jetbrains IDEs, you need to make a change to the
 files to trigger it.
@@ -147,7 +144,9 @@ contributions!
 Improving and expanding this project is my perpetual goal.
 Here's an insight into what I plan next:
 
-- **HTML / Sass default components**: In the future, I plan to incorporate a set of
+- **Component architecture**: I want to provide a simple way to develop components by
+  simplify the boilerplate between view and controller.
+- **Default components**: In the future, I plan to incorporate a set of
   default components into the project. This will help in establishing a
   consistent UI/UX throughout and will also save time and effort in design and
   development.
