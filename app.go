@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/Phosmachina/Vectra/generator"
+	"github.com/Phosmachina/vectra/generator"
 	"github.com/urfave/cli"
 	"log"
 	"os"

@@ -1,4 +1,4 @@
-module github.com/Phosmachina/Vectra
+module github.com/Phosmachina/vectra
 
 go 1.21
 

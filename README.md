@@ -4,8 +4,8 @@
 
 <div align="center">
 
-[![GoDoc](https://godoc.org/github.com/Phosmachina/Vectra?status.svg)](https://pkg.go.dev/github.com/Phosmachina/Vectra#section-documentation)
-[![Go Report Card](https://goreportcard.com/badge/github.com/Phosmachina/Vectra)](https://goreportcard.com/report/github.com/Phosmachina/Vectra)
+[![GoDoc](https://godoc.org/github.com/Phosmachina/vectra?status.svg)](https://pkg.go.dev/github.com/Phosmachina/vectra#section-documentation)
+[![Go Report Card](https://goreportcard.com/badge/github.com/Phosmachina/vectra)](https://goreportcard.com/report/github.com/Phosmachina/vectra)
 
 </div>
 
@@ -91,7 +91,7 @@ focus on building the core functionality and design of your website.
 If you are Go SDK, install with `go` command:
 
 ```shell
-go install github.com/Phosmachina/Vectra@latest
+go install github.com/Phosmachina/vectra@latest
 ```
 
 ### Deploy
