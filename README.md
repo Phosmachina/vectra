@@ -91,7 +91,7 @@ focus on building the core functionality and design of your website.
 If you are Go SDK, install with `go` command:
 
 ```shell
-go install github.com/Phosmachina/Vectra@v1.0.0
+go install github.com/Phosmachina/Vectra@latest
 ```
 
 ### Deploy
@@ -108,7 +108,7 @@ go install github.com/Phosmachina/Vectra@v1.0.0
   vectra -p path/YourProject gen
   ```
 
-- Launch watcher: The first time it might take some time because of container
+- Launch watcher: the first time it might take some time because of container
   creation and image download:
   ```shell
   vectra -p path/YourProject watch
