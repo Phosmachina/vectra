@@ -266,13 +266,23 @@ func (v *Vectra) Watch() {
 	)
 
 	go WatchFiles(filepath.Join(v.ProjectPath, "static", "js"),
-		[]string{"main.js"},
+		[]string{"main.js$"},
 		[]string{"prod"},
 		200, func(pth string) {
 			fmt.Print("JS ", pth, " | ")
 			_ = ExecuteCommand(fmt.Sprintf(
 				"docker start %s_MinifyJS", v.ProjectName), false, true)
 			fmt.Println("Minify DONE.")
+		},
+	)
+
+	go WatchFiles(filepath.Join(v.ProjectPath, "data", "i18n"),
+		[]string{".*en.*\\.ini$"},
+		[]string{},
+		200, func(pth string) {
+			fmt.Print("I18N helpers ", pth, " | ")
+			v.Generate("i18n")
+			fmt.Println("Generation DONE.")
 		},
 	)
 
