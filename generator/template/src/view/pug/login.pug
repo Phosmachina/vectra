@@ -2,7 +2,7 @@ extends shared/layout
 
 block content
 
-    h1 Login
+    h1 #{i18n.View.Login.Title()}
 
     .login-block
         form(ajax-func='login')
@@ -11,5 +11,5 @@ block content
 
             button.button(type='submit')
                 div
-                    p Login
+                    p #{i18n.View.Login.Btn_connect()}
                     +svg-arrow-right

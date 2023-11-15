@@ -33,7 +33,7 @@ func {{ .Name }} (
 		IsDev:    config.IsDev,
 		TabTitle: config.TabPrefix + tabSuffix,
 		User:     newUserCtx(userId),
-		Lang:     config.DefaultLang,
+		Lang:     config.CurrentLang,
 		Langs:     config.Langs,
 	}
 

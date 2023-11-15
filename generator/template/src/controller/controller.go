@@ -118,7 +118,6 @@ func HandleRequest[T any, K IObject](ctx *fiber.Ctx, useInfo func(T) (error,
 	if err != nil {
 		errName, _ := strings.CutPrefix(err.Error(), "Error")
 		r.Reason = _i18n.Get("error." + errName)
-		// TODO the status could be customized (map error/status?)
 		return ctx.Status(fiber.StatusBadRequest).JSON(r)
 	} else {
 		if onSuccess != nil {

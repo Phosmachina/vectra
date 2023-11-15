@@ -1,15 +1,45 @@
 
 #notification-group
     display: flex
+    flex-direction: column
+    justify-content: center
+    position: fixed
+    gap: 10px
+    transform: translateX(-50%)
+    left: 50%
+    top: 5%
+    margin: auto
+    z-index: 1
 
 @mixin notification($accent)
-    background-color: $accent
+    background: $accent
+    display: flex
+    gap: 5px
+    align-items: center
+    color: var(--text)
+    padding: 4px 10px
+    border-radius: 10px
+    margin: auto
+    box-shadow: 0 0 35px var(--background-luma-1)
+    animation: fadeIn 200ms ease
+
+    .close-btn
+        font-size: large
+        cursor: pointer
+        padding: 2px 8px
+        transition-duration: 200ms
+        border-radius: 5px
+        background-color: transparent
+
+    .close-btn:hover
+        background: var(--background-luma-3)
 
 .notification-info
-    @include notification(blue)
+    @include notification(var(--info))
 
 .notification-warn
-    @include notification(black)
+    @include notification(var(--warn))
 
 .notification-error
-    @include notification(black)
+    @include notification(var(--error))
+

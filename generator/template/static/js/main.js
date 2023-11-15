@@ -65,25 +65,26 @@ const handleInput = (labels, idxLabel) => {
 
     input.onchange = () => allVerify.forEach(verify => verify && verify())
 
-    return input
+    return labels[idxLabel]
 }
 
 const surveyForm = () => {
     let forms = document.querySelectorAll("form")
 
     for (let form of forms) {
-        let labels = form.querySelectorAll("label")
 
-        let inputs = Array.from({length: labels.length},
-            (_, idxLabel) => handleInput(labels, idxLabel))
-            .filter(input => input !== null)
+        let labels = form.querySelectorAll("label")
+        let inputs = Array.from(
+            {length: labels.length},
+            (_, idxLabel) => handleInput(labels, idxLabel)
+        ).filter(input => input !== null)
 
         form.onsubmit = (event) => {
             if (event) event.preventDefault()
 
-            let isReady = inputs.every(input => {
-                input.onchange(null)
-                return input.querySelectorAll(".advice").length === 0
+            let isReady = inputs.every(label => {
+                label.querySelector("input").onchange(null)
+                return label.querySelectorAll(".advice").length === 0
             })
 
             // for (let file of form.querySelector(".hide_file")) {
@@ -294,7 +295,7 @@ function toggleTheme() {
 
 function toggleLang(btn) {
     let lang = btn.querySelector("p").innerText;
-    simpleFetch("/api/v1/update/lang",new Map([["lang", lang]]) )
+    simpleFetch("/api/v1/update/lang", new Map([["lang", lang]]))
         .then(() => document.location.reload())
         .catch()
 }
@@ -369,7 +370,7 @@ function mapFormValues(form) {
 
 function newNotification(msg, type) {
 
-    let notification_group = document.getElementById("notification-group")
+    let notification_group = document.querySelector("#notification-group")
     let notification = document.querySelector("#notification").content.cloneNode(true).querySelector("div")
     let spans = notification.querySelectorAll("span")
 

@@ -17,6 +17,9 @@ $themes: (
         'grad-2-accent-3': hsl(196, 75%, 49%),
         'border': hsl(0, 0%, 48%),
         'border-luma-1': hsl(0, 0%, 86%),
+        'info': hsl(210, 61%, 40%),
+        'warn': hsl(27, 61%, 40%),
+        'error': hsl(348, 61%, 40%),
     ),
     'light':(
         'background': hsl(0, 0%, 100%),
@@ -36,6 +39,9 @@ $themes: (
         'grad-2-accent-3': hsl(196, 75%, 49%),
         'border': hsl(0, 0%, 55%),
         'border-luma-1': hsl(0, 0%, 18%),
+        'info': hsl(210, 100%, 77%),
+        'warn': hsl(27, 100%, 76%),
+        'error': hsl(347, 100%, 77%),
     ),
 )
 

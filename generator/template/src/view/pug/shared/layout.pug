@@ -39,7 +39,11 @@ html.theme-dark(lang=`${ctx.Lang}`)
                             #lang-switcher
                                 button(onclick="toggleLang(this)")
                                     p #{ctx.Lang}
-                                    +svg-flag-en
+                                    case ctx.Lang
+                                        when 'fr'
+                                            +svg-flag-fr
+                                        when 'en'
+                                            +svg-flag-en
                                 .popup
                                     each lang in ctx.Langs
                                         if lang != ctx.Lang
@@ -70,7 +74,7 @@ html.theme-dark(lang=`${ctx.Lang}`)
                 template#notification
                     .notification
                         span
-                        span &#10539;
+                        span.close-btn &#10539;
 
                 template#advice
                     .advice
@@ -84,4 +88,5 @@ html.theme-dark(lang=`${ctx.Lang}`)
                 block footer
                     .footer
                         p © Phosmachina
-                        p. Built with ❤️ on top of #[a(href='https://github.com/Phosmachina/Vectra') Vectra]
+                        p #{i18n.View.Layout.Footer_build()}
+                            a(href='https://github.com/Phosmachina/Vectra') Vectra

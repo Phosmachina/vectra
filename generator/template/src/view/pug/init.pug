@@ -2,7 +2,7 @@ extends shared/layout
 
 block content
 
-    h1 Configuration du compte administrateur
+    h1 #{i18n.View.Init.Title()}
 
     .init-block
         form(ajax-func='initRequest')
@@ -13,6 +13,5 @@ block content
 
             button.button(type='submit')
                 div
-                    p Create Admin account
+                    p #{i18n.View.Init.Btn_create_admin()}
                     +svg-arrow-right
-

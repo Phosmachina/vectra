@@ -11,4 +11,4 @@ block content
     p #{i18n.View.Index.Hello(ctx.Domain)}
 
     if ctx.User.Role.Level > 0
-        p Hello, you are #{ctx.User.Role.Name}
+        p #{i18n.View.Index.Hello_admin(ctx.User.Role.Name)}
