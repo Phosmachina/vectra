@@ -160,6 +160,11 @@ func WatchFiles(rootFolder string, includePatterns, excludePatterns []string, de
 
 				filePath := event.Name
 
+				// If a new directory is created, watch it.
+				if info, err := os.Stat(filePath); err == nil && info.IsDir() {
+					watcher.Add(filePath)
+				}
+
 				include := false
 				exclude := false
 
