@@ -121,7 +121,7 @@ your IDE.
 
 You need to make sure that the `*.pug` files are correctly transpiled to Go (there are
 transpiled to `src/view/go/`).
-Currently, with the file watchers in Jetbrains IDEs, you need to make a change to the
+Currently, with the file watchers, you need to make a change to the
 files to trigger it.
 
 After that, you can start your application.
