@@ -113,6 +113,12 @@ go install github.com/Phosmachina/vectra@latest
   vectra -p path/YourProject watch
   ```
 
+If you want to re-edit the configuration, maybe after that run a partial generation like 
+this to avoid file overwriting:
+```shell
+vectra -p path/YourProject -s types,controlers,services gen
+```
+
 ### Run
 
 Now you can open the folder `path/YourProject`, which Vectra created as a project with
