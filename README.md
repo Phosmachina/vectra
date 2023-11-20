@@ -39,9 +39,8 @@ goal is to minimize the complexity of development as much as possible. Ultimatel
 Vectra's goal is to leverage the unique design of each technology to achieve specific
 goals without investing excessive time and effort.
 
-[//]: # (<img src="docs/technologies.svg" width="100%" height="750px" alt="technologies overview">)
-
-By combining these technologies, Vectra offers a robust and streamlined development
+By combining these technologies (Go, Pug, Sass, Badger, ...), Vectra offers a robust and 
+streamlined development
 environment. It reduces the need for complex setups and integrations, allowing you to
 focus on building the core functionality and design of your website.
 
