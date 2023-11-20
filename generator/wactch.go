@@ -69,7 +69,7 @@ func CreateDockerContainer(containerName, projectPath, imageName string) error {
 	}
 
 	if string(output) == "" {
-		fmt.Println("Container does not exist, creating new one.")
+		fmt.Println("Container does not exist, creating new one...")
 	} else if err != nil {
 		return err
 	} else {
@@ -80,7 +80,7 @@ func CreateDockerContainer(containerName, projectPath, imageName string) error {
 	fullPathOfProject, _ := filepath.Abs(projectPath)
 	command = fmt.Sprintf("docker create --name=%s -v '%s:/vectra' %s", containerName,
 		fullPathOfProject, imageName)
-	err = ExecuteCommand(command, true, true)
+	err = ExecuteCommand(command, false, true)
 	if err != nil {
 		return err
 	}

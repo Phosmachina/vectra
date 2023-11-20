@@ -186,13 +186,24 @@ func NewVectra(projectPath string) *Vectra {
 		"project.yml",
 	))
 	if err != nil {
+		fmt.Println("No configuration file found ; use the default one.")
 		vectra = defaultVectra
+	}
+	err = yaml.Unmarshal(data, &vectra)
+	if err != nil {
+		log.Fatal("Failed to parse the project configuration file ; check syntax.")
+	}
+	if vectra.ProjectName == "" {
 		vectra.ProjectName = filepath.Base(projectPath)
 	}
-	if yaml.Unmarshal(data, &vectra) != nil {
-		vectra = defaultVectra
+
+	fullPath, err := filepath.Abs(projectPath)
+	if err == nil {
+		vectra.ProjectPath = fullPath
+	} else {
+		vectra.ProjectPath = projectPath
 	}
-	vectra.ProjectPath = projectPath
+
 	vectra.generators = generatorsToMap(
 		NewI18n(&vectra),
 		NewBase(&vectra),
@@ -202,16 +213,6 @@ func NewVectra(projectPath string) *Vectra {
 	)
 
 	return &vectra
-}
-
-func generatorsToMap(g ...*Generator) map[string]IGenerator {
-
-	m := map[string]IGenerator{}
-	for _, generator := range g {
-		m[generator.Name] = generator.IGenerator
-	}
-
-	return m
 }
 
 func (v *Vectra) Watch() {
@@ -228,8 +229,7 @@ func (v *Vectra) Watch() {
 	images := []string{"Autoprefixer", "Pug", "Sass", "MinifyJS", "MinifyCSS"}
 	for _, image := range images {
 		imageName := "phosmachina/" + strings.ToLower(image)
-		err := CreateDockerImage(image+".Dockerfile",
-			imageName)
+		err := CreateDockerImage(image+".Dockerfile", imageName)
 		if err != nil {
 			fmt.Println("Failed to create image: " + image)
 			return
@@ -421,4 +421,14 @@ func (v *Vectra) setField(path string, value any) error {
 	}
 
 	return nil
+}
+
+func generatorsToMap(g ...*Generator) map[string]IGenerator {
+
+	m := map[string]IGenerator{}
+	for _, generator := range g {
+		m[generator.Name] = generator.IGenerator
+	}
+
+	return m
 }

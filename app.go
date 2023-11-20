@@ -14,7 +14,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "vectra"
 	app.Usage = "Manage Vectra projects"
-	app.Version = "1.0.0"
+	app.Version = "1.0.1"
 
 	app.EnableBashCompletion = true
 
@@ -28,16 +28,8 @@ func main() {
 		{
 			Name:  "init",
 			Usage: "Initialize a folder with the default Vectra project file",
-			Flags: []cli.Flag{
-				cli.StringFlag{
-					Name:  "path, p",
-					Value: "./",
-					Usage: "Path to the directory where the Vectra project file will be initialized",
-				},
-			},
 			Action: func(c *cli.Context) error {
-				path := c.String("path")
-				log.Println("Initializing Vectra project at", path)
+				log.Println("Initializing Vectra project at", vectra.ProjectPath)
 				vectra.Init()
 				return nil
 			},
@@ -116,14 +108,12 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "path, p",
-			Value: "./",
 			Usage: "Path to the Vectra project file or directory",
 		},
 	}
 
 	app.Action = func(c *cli.Context) error {
-		path := c.String("path")
-		log.Println("Summarizing the state of deployment for Vectra project at", path)
+		log.Println("Summarizing the state of deployment for Vectra project at", vectra.ProjectPath)
 		vectra.FullReport()
 		return nil
 	}
