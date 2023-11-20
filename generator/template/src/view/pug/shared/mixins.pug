@@ -4,7 +4,7 @@ mixin inputToken()
             type='text'
             validation-0='validateInitToken'
             advice-0=`${i18n.View.Mixin.Advice.ValidateInitToken("<pre>./app/init-token</pre>")}`)
-        div(class='advice-group')
+        .advice-group
 
 mixin inputFirstname()
     label #{i18n.View.Mixin.Label.InputFirstname()}
@@ -14,7 +14,7 @@ mixin inputFirstname()
             placeholder='ex : Jean'
             validation-0='notEmpty'
             advice-0=`${i18n.View.Mixin.Advice.NotEmpty()}`)
-        div(class='advice-group')
+        .advice-group
 
 mixin inputLastname()
     label #{i18n.View.Mixin.Label.InputLastname()}
@@ -24,7 +24,7 @@ mixin inputLastname()
             placeholder='ex : Dupont'
             validation-0='notEmpty'
             advice-0=`${i18n.View.Mixin.Advice.NotEmpty()}`)
-        div(class='advice-group')
+        .advice-group
 
 mixin inputEmail()
     label #{i18n.View.Mixin.Label.InputEmail()}
@@ -34,7 +34,7 @@ mixin inputEmail()
             placeholder='ex : jean.dupont@gmail.com'
             validation-0='validateEmail'
             advice-0=`${i18n.View.Mixin.Advice.ValidateEmail()}`)
-        div(class='advice-group')
+        .advice-group
 
 mixin inputNewPassword()
     label #{i18n.View.Mixin.Label.InputNewPassword()}
@@ -51,7 +51,7 @@ mixin inputNewPassword()
             advice-2=`${i18n.View.Mixin.Advice.AtLeastNumber()}`
             advice-3=`${i18n.View.Mixin.Advice.AtLeastSpecialChar()}`
             advice-4=`${i18n.View.Mixin.Advice.AtLeast8Char()}`)
-        div(class='advice-group')
+        .advice-group
 
 mixin inputRepeatPassword()
     label #{i18n.View.Mixin.Label.InputRepeatPassword()}
@@ -60,7 +60,7 @@ mixin inputRepeatPassword()
             autocomplete='new-password'
             validation-0='sameAsPrevious'
             advice-0=`${i18n.View.Mixin.Advice.SameAsPrevious()}`)
-        div(class='advice-group')
+        .advice-group
 
 mixin inputRequestPassword()
     label #{i18n.View.Mixin.Label.InputRequestPassword()}
@@ -69,4 +69,4 @@ mixin inputRequestPassword()
             autocomplete='current-password'
             validation-0='atLeast8Char'
             advice-0=`${i18n.View.Mixin.Advice.AtLeast8Char()}`)
-        div(class='advice-group')
+        .advice-group
