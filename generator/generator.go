@@ -510,6 +510,9 @@ func extractFunctionBody(path string) map[string]string {
 }
 
 func extractPartOfFile(start, end token.Pos, file *os.File) string {
+	if start >= end {
+		return ""
+	}
 	_, err := file.Seek(0, 0)
 	if err != nil {
 		log.Fatal(err)
