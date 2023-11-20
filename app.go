@@ -1,10 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"github.com/Phosmachina/vectra/generator"
 	"github.com/urfave/cli"
-	"log"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -13,7 +14,8 @@ func main() {
 
 	app := cli.NewApp()
 	app.Name = "vectra"
-	app.Usage = "Manage Vectra projects"
+	app.Usage = "Manage Vectra projects: initialize projet, report current state, " +
+		"and generate files following configuration"
 	app.Version = "1.0.1"
 
 	app.EnableBashCompletion = true
@@ -21,6 +23,9 @@ func main() {
 	app.Before = func(c *cli.Context) error {
 		path := c.String("path")
 		vectra = generator.NewVectra(path)
+		c.App.Metadata = map[string]any{
+			"select": c.String("select"),
+		}
 		return nil
 	}
 
@@ -29,75 +34,33 @@ func main() {
 			Name:  "init",
 			Usage: "Initialize a folder with the default Vectra project file",
 			Action: func(c *cli.Context) error {
-				log.Println("Initializing Vectra project at", vectra.ProjectPath)
+				fmt.Println("Initializing Vectra project at", vectra.ProjectPath)
 				vectra.Init()
-				return nil
-			},
-			OnUsageError: func(c *cli.Context, err error, isSubcommand bool) error {
-				log.Println("Initializing Vectra project at", vectra.ProjectPath)
 				return nil
 			},
 		},
 		{
 			Name:  "gen",
 			Usage: "Generate Vectra project templates",
+			Flags: []cli.Flag{},
 			Action: func(c *cli.Context) error {
-				log.Println("Generate all parts of Vectra.")
-				vectra.FullGenerate()
+				generators := strings.Split(c.App.Metadata["select"].(string), ",")
+				if len(generators) == 1 && generators[0] == "" {
+					fmt.Println("🔧 Generating all templates available.")
+					vectra.FullGenerate()
+				} else {
+					for _, s := range generators {
+						fmt.Println("🔧 Generating", s, "template.")
+						vectra.Generate(s)
+					}
+				}
 				return nil
-			},
-			Subcommands: []cli.Command{
-				{
-					Name:  "i18n",
-					Usage: "Generate the i18n part of the Vectra project",
-					Action: func(c *cli.Context) error {
-						log.Println("Generating i18n template.")
-						vectra.Generate("i18n")
-						return nil
-					},
-				},
-				{
-					Name:  "controllers",
-					Usage: "Generate controllers part of the Vectra project",
-					Action: func(c *cli.Context) error {
-						log.Println("Generating controllers template.")
-						vectra.Generate("controllers")
-						return nil
-					},
-				},
-				{
-					Name:  "base",
-					Usage: "Generate base part of the Vectra project",
-					Action: func(c *cli.Context) error {
-						log.Println("Copy base parts following configuration.")
-						vectra.Generate("base")
-						return nil
-					},
-				},
-				{
-					Name:  "types",
-					Usage: "Generate types part of the Vectra project",
-					Action: func(c *cli.Context) error {
-						log.Println("Generate types parts following configuration.")
-						vectra.Generate("types")
-						return nil
-					},
-				},
-				{
-					Name:  "services",
-					Usage: "Generate services part of the Vectra project",
-					Action: func(c *cli.Context) error {
-						log.Println("Generate services parts following configuration.")
-						vectra.Generate("services")
-						return nil
-					},
-				},
-				// Add more subcommands as needed
 			},
 		},
 		{
-			Name:  "watch",
-			Usage: "Survey Sass, Pug files of Vectra project and execute pipeline.",
+			Name: "watch",
+			Usage: "Survey Sass, Pug files of Vectra project and execute pipeline" +
+				"Check Docker, build Docker images and containers if not exist",
 			Action: func(c *cli.Context) error {
 				vectra.Watch()
 				return nil
@@ -108,18 +71,33 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  "path, p",
-			Usage: "Path to the Vectra project file or directory",
+			Usage: "Path to the Vectra project directory.",
+		},
+		cli.StringFlag{
+			Name: "select, s",
+			Usage: "List of generator name separated by comma. " +
+				"Empty value run all generators. (e.g.: services,controllers). " +
+				"Available generators: base, types, services, controllers, " +
+				"i18n (managed by watcher)",
 		},
 	}
 
 	app.Action = func(c *cli.Context) error {
-		log.Println("Summarizing the state of deployment for Vectra project at", vectra.ProjectPath)
-		vectra.FullReport()
+		generators := strings.Split(c.String("select"), ",")
+		if len(generators) == 1 && generators[0] == "" {
+			fmt.Println("Summarizing the state of deployment for Vectra project at",
+				vectra.ProjectPath)
+			vectra.FullReport()
+		} else {
+			for _, s := range generators {
+				vectra.Report(s)
+			}
+		}
 		return nil
 	}
 
 	err := app.Run(os.Args)
 	if err != nil {
-		log.Println(err)
+		fmt.Println(err)
 	}
 }

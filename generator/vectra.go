@@ -253,7 +253,7 @@ func (v *Vectra) Watch() {
 		[]string{".*\\.pug$"},
 		[]string{".*completion_variable.*"},
 		50, func(pth string) {
-			fmt.Print("PUG ", pth, " | ")
+			log.Print("PUG ", pth, " | ")
 			rel, _ := filepath.Rel(v.ProjectPath, pth)
 			c := fmt.Sprintf(
 				"docker exec %s jade -writer -pkg view -d /vectra/src/view/go /vectra/%s",
@@ -269,7 +269,7 @@ func (v *Vectra) Watch() {
 		[]string{"main.js$"},
 		[]string{"prod"},
 		200, func(pth string) {
-			fmt.Print("JS ", pth, " | ")
+			log.Print("JS ", pth, " | ")
 			_ = ExecuteCommand(fmt.Sprintf(
 				"docker start %s_MinifyJS", v.ProjectName), false, true)
 			fmt.Println("Minify DONE.")
@@ -280,7 +280,7 @@ func (v *Vectra) Watch() {
 		[]string{".*en.*\\.ini$"},
 		[]string{},
 		200, func(pth string) {
-			fmt.Print("I18N helpers ", pth, " | ")
+			log.Print("I18N helpers ", pth, " | ")
 			v.Generate("i18n")
 			fmt.Println("Generation DONE.")
 		},
@@ -290,7 +290,7 @@ func (v *Vectra) Watch() {
 		[]string{".*\\.sass$", ".*\\.scss$"},
 		[]string{},
 		200, func(pth string) {
-			fmt.Print("CSS ", pth, " | ")
+			log.Print("CSS ", pth, " | ")
 			_ = ExecuteCommand(
 				fmt.Sprintf("docker start %s_Sass", v.ProjectName), false, true)
 			fmt.Print("Sass DONE, ")
@@ -309,7 +309,8 @@ func (v *Vectra) Init() {
 
 	err := os.MkdirAll(filepath.Join(v.ProjectPath, FolderProject), 0755)
 	if err != nil {
-		// TODO print error
+		fmt.Println("Failed to create the project directory:", err)
+		return
 	}
 
 	data, err := yaml.Marshal(v)
@@ -322,7 +323,7 @@ func (v *Vectra) Init() {
 		"project.yml",
 	)
 	if os.WriteFile(path, data, 0644) != nil {
-		log.Println("Failed to write project config.")
+		log.Println("Failed to write the project config.")
 	}
 }
 
@@ -339,11 +340,21 @@ func (v *Vectra) FullGenerate() {
 }
 
 func (v *Vectra) Generate(key string) {
-	v.generators[key].Generate()
+	generator, ok := v.generators[key]
+	if !ok {
+		fmt.Println("The generator", key, "does not exist.")
+		return
+	}
+	generator.Generate()
 }
 
 func (v *Vectra) Report(key string) {
-	v.generators[key].PrintReport()
+	generator, ok := v.generators[key]
+	if !ok {
+		fmt.Println("The generator", key, "does not exist.")
+		return
+	}
+	generator.PrintReport()
 }
 
 func (v *Vectra) GetFieldsAsMap(paths []string) map[string]any {
