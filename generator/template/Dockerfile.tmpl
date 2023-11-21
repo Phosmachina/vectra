@@ -1,5 +1,5 @@
 # The alpine go-image
-FROM golang:1.21-alpine
+FROM alpine:latest
 
 # Create a directory for the app
 RUN mkdir /app
@@ -8,8 +8,8 @@ RUN mkdir /app
 COPY website /app/
 
 # Copy business files
-COPY static/css/style.css /app/static/css/
-COPY static/js/main.js /app/static/js/
+COPY static/css/prod-style.css /app/static/css/
+COPY static/js/prod-main.js /app/static/js/
 COPY static/img/ /app/static/img/
 COPY static/favicon.ico /app/static/
 
