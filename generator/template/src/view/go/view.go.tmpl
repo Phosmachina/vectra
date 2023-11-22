@@ -22,7 +22,14 @@ type {{ .Name }} struct {
 
 func {{ .Name }} (
 {{- range .Attributes }} {{- .Name }} {{ .Type }}, {{ end -}}
-) {{ .Name | TrimNewPrefix }} {
+)
+{{- if .IsPageCtx -}}
+	GlobalCtx
+{{- else -}}
+	{{ .Name | TrimNewPrefix }}
+{{- end -}}
+{
+
 {{- if KeyExist .Name $bodies }}
 {{ index $bodies .Name -}}
 {{ else }}

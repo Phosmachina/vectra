@@ -2,8 +2,14 @@ package generator
 
 type ViewTypes struct {
 	Types        []VectraType[SimpleAttribute] `yaml:"types"`
-	Constructors []VectraType[SimpleAttribute] `yaml:"constructors"`
+	Constructors []ViewTypeConstructor         `yaml:"constructors"`
 	Bodies       map[string]string             `yaml:"-"`
+}
+
+type ViewTypeConstructor struct {
+	Name       string            `yaml:"name"`
+	IsPageCtx  bool              `yaml:"is_page_ctx"`
+	Attributes []SimpleAttribute `yaml:"attributes"`
 }
 
 type VectraType[T any] struct {

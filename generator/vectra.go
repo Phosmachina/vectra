@@ -52,12 +52,12 @@ var (
 					{Name: "Email", Type: "string"},
 				}},
 			},
-			Constructors: []VectraType[SimpleAttribute]{
+			Constructors: []ViewTypeConstructor{
 				{Name: "NewGlobalCtx", Attributes: []SimpleAttribute{
 					{Name: "tabSuffix", Type: "string"},
 					{Name: "userId", Type: "string"},
 				}},
-				{Name: "newUserCtx", Attributes: []SimpleAttribute{
+				{IsPageCtx: false, Name: "newUserCtx", Attributes: []SimpleAttribute{
 					{Name: "userId", Type: "string"},
 				}},
 			},
