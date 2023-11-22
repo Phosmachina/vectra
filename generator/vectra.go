@@ -307,7 +307,7 @@ func (v *Vectra) Watch() {
 
 func (v *Vectra) Init() {
 
-	err := os.MkdirAll(filepath.Join(v.ProjectPath, FolderProject), 0755)
+	err := os.MkdirAll(filepath.Join(v.ProjectPath, FolderReport), 0755)
 	if err != nil {
 		fmt.Println("Failed to create the project directory:", err)
 		return

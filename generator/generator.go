@@ -27,6 +27,7 @@ var (
 	EmbedFS embed.FS
 
 	FolderProject  = ".vectra"
+	FolderReport   = filepath.Join(FolderProject, "report")
 	FolderTemplate = "template"
 )
 
@@ -112,7 +113,7 @@ func NewAbstractGenerator(
 func (g *Generator) init() {
 	data, err := os.ReadFile(filepath.Join(
 		g.projectPath,
-		FolderProject,
+		FolderReport,
 		g.Name+"_report.yml",
 	))
 	if err != nil {
@@ -243,7 +244,7 @@ func (g *Generator) updateReport() {
 	}
 	path := filepath.Join(
 		g.projectPath,
-		FolderProject,
+		FolderReport,
 		g.Name+"_report.yml",
 	)
 
