@@ -158,7 +158,7 @@ func (s *{{ $name }}) {{ .Name }}(
 
 type {{ .Name }} struct {
 {{ range .Attributes -}}
-	{{ .Name }} {{ .Type }} `mod:"{{ .ModTag }}" validate:"{{ .ValidatorTag}}" json:"{{ .Name | ToLower }}"`
+	{{ .Name }} {{ .Type }} `mod:"{{ .ModTag }}" validate:"{{ .ValidatorTag}}" json:"{{ .Name | CamelToSnake }}"`
 {{ end -}}
 }
 

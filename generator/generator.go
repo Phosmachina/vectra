@@ -6,6 +6,7 @@ import (
 	"embed"
 	"encoding/hex"
 	"fmt"
+	"github.com/serenize/snaker"
 	"go/ast"
 	"go/format"
 	"go/parser"
@@ -188,7 +189,7 @@ func (g *Generator) Generate(ctx any) {
 		parsed, err := template.New("tmpl").Funcs(
 			template.FuncMap{"Upper": Upper},
 		).Funcs(
-			template.FuncMap{"ToLower": strings.ToLower},
+			template.FuncMap{"CamelToSnake": snaker.CamelToSnake},
 		).Funcs(
 			template.FuncMap{"TrimPluralization": TrimPluralization},
 		).Funcs(
