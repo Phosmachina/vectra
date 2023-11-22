@@ -34,23 +34,23 @@ func {{ .Name }} (
 {{ index $bodies .Name -}}
 {{ else }}
 	{{- if eq "NewGlobalCtx" .Name }}
-	config := GetApiV1().GetStore().Config
 
-	ctx := GlobalCtx{
-		IsDev:    config.IsDev,
+		config := GetApiV1().GetStore().Config
+		ctx := GlobalCtx{
+		IsDev:    IsDev,
 		TabTitle: config.TabPrefix + tabSuffix,
 		User:     newUserCtx(userId),
 		Lang:     config.CurrentLang,
-		Langs:     config.Langs,
-	}
+		Langs:    Langs,
+		}
 
-	if ctx.IsDev {
+		if ctx.IsDev {
 		ctx.Domain = config.DevDomain
-	} else {
-		ctx.Domain = config.Domain
-	}
+		} else {
+		ctx.Domain = config.ProdDomain
+		}
 
-	return ctx
+		return ctx
 {{ else if eq "newUserCtx" .Name }}
 	if userId == "" {
 		return UserCtx{}

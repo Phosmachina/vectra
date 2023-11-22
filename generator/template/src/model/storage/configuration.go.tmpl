@@ -1,0 +1,26 @@
+package storage
+
+{{ with .Configuration }}
+
+    const (
+    IsDev       = {{ .IsDev }}
+    DefaultLang = "{{ .DefaultLang }}"
+    )
+
+    var (
+    Langs = []string{"en", "fr"}
+    )
+
+
+    type configuration struct {
+    {{ range .Configuration -}}
+        {{ .Name }} {{ .Type -}}
+        {{ if .IsTransient -}}
+            `yaml:"-"`
+        {{ else -}}
+            `yaml:"{{ .Name | CamelToSnake }}"`
+        {{ end -}}
+    {{ end }}
+    }
+
+{{ end }}

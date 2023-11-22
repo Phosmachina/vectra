@@ -29,17 +29,16 @@ type Host struct {
 
 func main() {
 
-	err := i18n.GetInstance().SetUp(GetApiV1().GetStore().Config.Langs...)
+	err := i18n.GetInstance().SetUp(Langs...)
 	if err != nil {
 		panic(err)
 	}
 
-	isDev := GetApiV1().GetStore().Config.IsDev
-	currentDomain := getDomainName(isDev)
+	currentDomain := getDomainName(IsDev)
 	hosts := map[string]*Host{}
 	store := session.New(session.Config{
 		KeyLookup:      "cookie:" + CookieNameForSession,
-		CookieSecure:   !isDev,
+		CookieSecure:   !IsDev,
 		CookieHTTPOnly: true,
 	})
 
@@ -47,10 +46,10 @@ func main() {
 	makeStatic(store, hosts, currentDomain)
 
 	// Website
-	makeWebsite(isDev, store, hosts, currentDomain)
+	makeWebsite(store, hosts, currentDomain)
 
 	// Start the app
-	log.Fatal(createApp(hosts).Listen(currentDomain))
+	log.Fatal(createApp(hosts).Listen(GetApiV1().GetStore().Config.ListenTo))
 }
 
 func makeStatic(store *session.Store, hosts map[string]*Host, currentDomain string) {
@@ -74,7 +73,7 @@ func makeStatic(store *session.Store, hosts map[string]*Host, currentDomain stri
 	hosts["static."+currentDomain] = &Host{static}
 }
 
-func makeWebsite(isDev bool, store *session.Store, hosts map[string]*Host, currentDomain string) {
+func makeWebsite(store *session.Store, hosts map[string]*Host, currentDomain string) {
 
 	firstLaunchHandler := func(ctx *fiber.Ctx) error {
 		isFirstLaunch := GetApiV1().IsFirstLaunch()
@@ -100,7 +99,7 @@ func makeWebsite(isDev bool, store *session.Store, hosts map[string]*Host, curre
 	}
 	csrfHandler := csrf.New(csrf.Config{
 		CookieName:     CookieNameForCSRF,
-		CookieSecure:   !isDev,
+		CookieSecure:   !IsDev,
 		Expiration:     time.Minute * 30,
 		CookieSameSite: "Strict",
 		Storage:        store.Storage,
@@ -164,5 +163,5 @@ func getDomainName(isDev bool) string {
 	if isDev {
 		return GetApiV1().GetStore().Config.DevDomain
 	}
-	return GetApiV1().GetStore().Config.Domain
+	return GetApiV1().GetStore().Config.ProdDomain
 }

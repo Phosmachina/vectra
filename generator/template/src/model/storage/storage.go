@@ -72,7 +72,7 @@ func (s Storage) LoadConfiguration() {
 	if err := yaml.Unmarshal(data, s.Config); err != nil {
 		log.Fatal(err)
 	}
-	s.Config.CurrentLang = s.Config.DefaultLang
+	s.Config.CurrentLang = DefaultLang
 }
 
 type SessionItem struct {

@@ -14,52 +14,72 @@ import (
 var (
 	defaultVectra = Vectra{
 		DefaultLang:          "en",
-		DevPort:              8080,
-		ProductionPort:       8100,
+		ListenTo:             "127.0.0.1:8100",
+		DevDomain:            "localhost:8100",
 		WithGitignore:        true,
 		WithDockerDeployment: true,
 		WithI18nExample:      true,
 		WithSassExample:      true,
 		WithPugExample:       true,
 		StorageTypes: []VectraType[SimpleAttribute]{
-			{Name: "Role", Attributes: []SimpleAttribute{
-				{Name: "Name", Type: "string"},
-				{Name: "Level", Type: "int"}}},
-			{Name: "User", Attributes: []SimpleAttribute{
-				{Name: "IsActivated", Type: "bool"},
-				{Name: "Password", Type: "[]byte"},
-				{Name: "Firstname", Type: "string"},
-				{Name: "Lastname", Type: "string"},
-				{Name: "Email", Type: "string"},
-				{Name: "Sessions", Type: "map[string]SessionItem"}}},
-		},
-		ViewTypes: ViewTypes{
-			Types: []VectraType[SimpleAttribute]{
-				{Name: "GlobalCtx", Attributes: []SimpleAttribute{
-					{Name: "IsDev", Type: "bool"},
-					{Name: "Domain", Type: "string"},
-					{Name: "TabTitle", Type: "string"},
-					{Name: "Lang", Type: "string"},
-					{Name: "Langs", Type: "[]string"},
-					{Name: "User", Type: "UserCtx"},
-				}},
-				{Name: "UserCtx", Attributes: []SimpleAttribute{
-					{Name: "ID", Type: "string"},
-					{Name: "Role", Type: "Role"},
+			{
+				"Role",
+				[]SimpleAttribute{
+					{Name: "Name", Type: "string"},
+					{Name: "Level", Type: "int"}},
+			},
+			{
+				"User",
+				[]SimpleAttribute{
 					{Name: "IsActivated", Type: "bool"},
+					{Name: "Password", Type: "[]byte"},
 					{Name: "Firstname", Type: "string"},
 					{Name: "Lastname", Type: "string"},
 					{Name: "Email", Type: "string"},
-				}},
+					{Name: "Sessions", Type: "map[string]SessionItem"}},
+			},
+		},
+		ViewTypes: ViewTypes{
+			Types: []VectraType[SimpleAttribute]{
+				{
+					"GlobalCtx",
+					[]SimpleAttribute{
+						{Name: "IsDev", Type: "bool"},
+						{Name: "Domain", Type: "string"},
+						{Name: "TabTitle", Type: "string"},
+						{Name: "Lang", Type: "string"},
+						{Name: "Langs", Type: "[]string"},
+						{Name: "User", Type: "UserCtx"},
+					},
+				},
+				{
+					"UserCtx",
+					[]SimpleAttribute{
+						{Name: "ID", Type: "string"},
+						{Name: "Role", Type: "Role"},
+						{Name: "IsActivated", Type: "bool"},
+						{Name: "Firstname", Type: "string"},
+						{Name: "Lastname", Type: "string"},
+						{Name: "Email", Type: "string"},
+					},
+				},
 			},
 			Constructors: []ViewTypeConstructor{
-				{Name: "NewGlobalCtx", Attributes: []SimpleAttribute{
-					{Name: "tabSuffix", Type: "string"},
-					{Name: "userId", Type: "string"},
-				}},
-				{IsPageCtx: false, Name: "newUserCtx", Attributes: []SimpleAttribute{
-					{Name: "userId", Type: "string"},
-				}},
+				{
+					"NewGlobalCtx",
+					false,
+					[]SimpleAttribute{
+						{Name: "tabSuffix", Type: "string"},
+						{Name: "userId", Type: "string"},
+					},
+				},
+				{
+					"newUserCtx",
+					false,
+					[]SimpleAttribute{
+						{Name: "userId", Type: "string"},
+					},
+				},
 			},
 		},
 		Controllers: []Controller{
@@ -118,41 +138,38 @@ var (
 				},
 				ExchangeTypes: []VectraType[AttributeWithTag]{
 					{Name: "ConnectExch", Attributes: []AttributeWithTag{
-						{SimpleAttribute: SimpleAttribute{Name: "Email", Type: "string"},
-							ModTag: "trim,lcase", ValidatorTag: "required,email"},
-						{SimpleAttribute: SimpleAttribute{Name: "Password", Type: "string"},
-							ModTag: "", ValidatorTag: "required"},
+						{SimpleAttribute{Name: "Email", Type: "string"}, "trim,lcase", "required,email"},
+						{SimpleAttribute{Name: "Password", Type: "string"}, "", "required"},
 					}},
 					{Name: "ConnectAdminExch", Attributes: []AttributeWithTag{
-						{SimpleAttribute: SimpleAttribute{Name: "Password", Type: "string"},
-							ModTag: "", ValidatorTag: "required"},
-						{SimpleAttribute: SimpleAttribute{Name: "Email", Type: "string"},
-							ModTag: "trim,lcase", ValidatorTag: "required,email"},
-						{SimpleAttribute: SimpleAttribute{Name: "Token", Type: "string"},
-							ModTag: "", ValidatorTag: "required"},
+						{SimpleAttribute{Name: "Password", Type: "string"}, "", "required"},
+						{SimpleAttribute{Name: "Email", Type: "string"}, "trim,lcase", "required,email"},
+						{SimpleAttribute{Name: "Token", Type: "string"}, "", "required"},
 					}},
 					{Name: "UserExch", Attributes: []AttributeWithTag{
-						{SimpleAttribute: SimpleAttribute{Name: "ID", Type: "string"},
-							ModTag: "", ValidatorTag: ""},
-						{SimpleAttribute: SimpleAttribute{Name: "Password", Type: "string"},
-							ModTag: "trim,lcase", ValidatorTag: "required"},
-						{SimpleAttribute: SimpleAttribute{Name: "Firstname", Type: "string"},
-							ModTag: "trim,lcase", ValidatorTag: "required"},
-						{SimpleAttribute: SimpleAttribute{Name: "Lastname", Type: "string"},
-							ModTag: "trim,lcase", ValidatorTag: "required"},
-						{SimpleAttribute: SimpleAttribute{Name: "Email", Type: "string"},
-							ModTag: "trim,lcase", ValidatorTag: "required,email"},
+						{SimpleAttribute{Name: "ID", Type: "string"}, "", ""},
+						{SimpleAttribute{Name: "Password", Type: "string"}, "trim,lcase", "required"},
+						{SimpleAttribute{Name: "Firstname", Type: "string"}, "trim,lcase", "required"},
+						{SimpleAttribute{Name: "Lastname", Type: "string"}, "trim,lcase", "required"},
+						{SimpleAttribute{Name: "Email", Type: "string"}, "trim,lcase", "required,email"},
 					}},
 					{Name: "LangExch", Attributes: []AttributeWithTag{
-						{SimpleAttribute: SimpleAttribute{Name: "Lang", Type: "string"},
-							ModTag: "trim,lcase", ValidatorTag: "required"},
+						{SimpleAttribute{Name: "Lang", Type: "string"}, "trim,lcase", "required"},
 					}},
 					{Name: "ReasonExch", Attributes: []AttributeWithTag{
-						{SimpleAttribute: SimpleAttribute{Name: "Reason", Type: "string"},
-							ModTag: "", ValidatorTag: ""},
+						{SimpleAttribute{Name: "Reason", Type: "string"}, "", ""},
 					}},
 				},
 			},
+		},
+		Configuration: []ConfigurationAttribute{
+			{SimpleAttribute{Name: "ListenTo", Type: "string"}, false},
+			{SimpleAttribute{Name: "DevDomain", Type: "string"}, false},
+			{SimpleAttribute{Name: "ProdDomain", Type: "string"}, false},
+			{SimpleAttribute{Name: "TabPrefix", Type: "string"}, false},
+			{SimpleAttribute{Name: "CurrentLang", Type: "string"}, true},
+			{SimpleAttribute{Name: "Roles", Type: "map[string]int"}, false},
+			{SimpleAttribute{Name: "AccessRules", Type: "[]AccessRule"}, false},
 		},
 	}
 )
@@ -163,9 +180,9 @@ type Vectra struct {
 
 	ProjectName          string                        `yaml:"project_name"`
 	DefaultLang          string                        `yaml:"default_lang"`
-	DevPort              int                           `yaml:"dev_port"`
-	ProductionPort       int                           `yaml:"production_port"`
-	ProductionDomain     string                        `yaml:"production_domain"`
+	ListenTo             string                        `yaml:"listen_to"`
+	DevDomain            string                        `yaml:"dev_domain"`
+	ProdDomain           string                        `yaml:"prod_domain"`
 	WithGitignore        bool                          `yaml:"with_gitignore"`
 	WithDockerDeployment bool                          `yaml:"with_docker_deployment"`
 	WithI18nExample      bool                          `yaml:"with_i18n_example"`
@@ -175,6 +192,7 @@ type Vectra struct {
 	ViewTypes            ViewTypes                     `yaml:"view_types"`
 	Controllers          []Controller                  `yaml:"controllers"`
 	Services             []Service                     `yaml:"services"`
+	Configuration        []ConfigurationAttribute      `yaml:"configuration"`
 }
 
 func NewVectra(projectPath string) *Vectra {

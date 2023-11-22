@@ -1,18 +1,8 @@
-#######################
-# Dev information:
-#######################
 
-is_dev: true
-dev_domain: localhost:{{ .DevPort }}
-
-#######################
-# General information:
-#######################
-
-domain: {{ .Domain }}
+listen_to: {{ .ListenTo }}
+dev_domain: {{ .DevDomain }}
+prod_domain: {{ .ProdDomain }}
 tab_prefix: "Vectra | "
-default_lang: {{ .DefaultLang }}
-langs: [ en, fr ]
 
 roles:
   none: 0

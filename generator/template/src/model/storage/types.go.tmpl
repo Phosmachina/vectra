@@ -5,24 +5,6 @@ import (
 	. "github.com/Phosmachina/FluentKV/reldb"
 )
 
-type configuration struct {
-	Version     string   `yaml:"version"`
-	IsDev       bool     `yaml:"is_dev"`
-	CssFiles    []string `yaml:"css_files"`
-	JsFiles     []string `yaml:"js_files"`
-	DevDomain   string   `yaml:"dev_domain"`
-	Domain      string   `yaml:"domain"`
-	AppName     string   `yaml:"app_name"`
-	AppTitle    string   `yaml:"app_title"`
-	TabPrefix   string   `yaml:"tab_prefix"`
-	DefaultLang string   `yaml:"default_lang"`
-	Langs       []string `yaml:"langs"`
-	CurrentLang string
-
-	Roles       map[string]int `yaml:"roles"`
-	AccessRules []AccessRule   `yaml:"access_rules"`
-}
-
 {{ with .StorageTypes }}
 
 func GobRegistration() {

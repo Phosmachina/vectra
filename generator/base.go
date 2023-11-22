@@ -7,8 +7,7 @@ type Base struct {
 func NewBase(cfg *Vectra) *Generator {
 
 	files := []SourceFile{
-		NewDynSourceFile("data/config/configuration.yml.tmpl",
-			"data/config/configuration.yml", Copy),
+		NewSourceFile("data/config/configuration.yml.tmpl", Copy),
 		NewSourceFile("static/favicon.ico", Skeleton),
 		NewSourceFile("static/js/main.js", Copy),
 		NewSourceFile("app.go", CorePart),
@@ -51,9 +50,9 @@ func NewBase(cfg *Vectra) *Generator {
 			"WithPugExample",
 			"WithGitignore",
 			"WithDockerDeployment",
-			"ProductionPort",
-			"DevPort",
-			"Domain",
+			"ListenTo",
+			"DevDomain",
+			"ProdDomain",
 			"DefaultLang",
 		},
 		Report{
@@ -70,9 +69,9 @@ func NewBase(cfg *Vectra) *Generator {
 
 func (i *Base) Generate() {
 	i.Generator.Generate(map[string]any{
-		"ProductionPort": i.vectra.ProductionPort,
-		"DevPort":        i.vectra.DevPort,
-		"Domain":         i.vectra.ProductionDomain,
-		"DefaultLang":    i.vectra.DefaultLang,
+		"ListenTo":    i.vectra.ListenTo,
+		"DevDomain":   i.vectra.DevDomain,
+		"ProdDomain":  i.vectra.ProdDomain,
+		"DefaultLang": i.vectra.DefaultLang,
 	})
 }

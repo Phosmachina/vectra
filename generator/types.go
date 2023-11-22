@@ -28,6 +28,11 @@ type AttributeWithTag struct {
 	ValidatorTag    string `yaml:"validator"`
 }
 
+type ConfigurationAttribute struct {
+	SimpleAttribute `yaml:"base"`
+	IsTransient     bool `yaml:"is_transient"`
+}
+
 type Types struct {
 	*Generator
 }
@@ -37,11 +42,14 @@ func NewTypes(cfg *Vectra) *Generator {
 	generator := NewAbstractGenerator(
 		"types",
 		[]string{
+			"Configuration",
+			"DefaultLang",
 			"StorageTypes",
 			"ViewTypes",
 		},
 		Report{
 			Files: []SourceFile{
+				NewSourceFile("src/model/storage/configuration.go.tmpl", FullGen),
 				NewSourceFile("src/model/storage/types.go.tmpl", FullGen),
 				NewSourceFile("src/view/go/view.go.tmpl", Skeleton),
 			},
@@ -61,6 +69,11 @@ func (i *Types) Generate() {
 		i.vectra.ProjectPath + "/src/view/go/view.go")
 
 	i.Generator.Generate(map[string]any{
+		"Configuration": map[string]any{
+			"IsDev":         true,
+			"DefaultLang":   i.vectra.DefaultLang,
+			"Configuration": i.vectra.Configuration,
+		},
 		"StorageTypes": i.vectra.StorageTypes,
 		"ViewTypes":    i.vectra.ViewTypes,
 	})
