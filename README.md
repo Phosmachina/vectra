@@ -15,17 +15,18 @@
 </summary>
 
 <!-- TOC -->
-
-* [🎯 Overview](#-overview)
-* [⚡️ Features](#-features)
-* [🚀 Getting started](#-getting-started)
+  * [🎯 Overview](#-overview)
+  * [⚡️ Features](#-features)
+  * [🚀 Getting started](#-getting-started)
     * [Prerequisite](#prerequisite)
     * [Install Vectra](#install-vectra)
     * [Deploy](#deploy)
     * [Run](#run)
-* [🤝 Contributing](#-contributing)
-* [🕘 What's next](#-whats-next)
-
+  * [🤝 Contributing](#-contributing)
+  * [🕘 What's next](#-whats-next)
+    * [Shortly](#shortly)
+    * [Planned](#planned)
+    * [Under consideration](#under-consideration)
 <!-- TOC -->
 
 </details>
@@ -39,7 +40,7 @@ goal is to minimize the complexity of development as much as possible. Ultimatel
 Vectra's goal is to leverage the unique design of each technology to achieve specific
 goals without investing excessive time and effort.
 
-By combining these technologies (Go, Pug, Sass, Badger, ...), Vectra offers a robust and 
+By combining these technologies (Go, Pug, Sass, Badger, ...), Vectra offers a robust and
 streamlined development
 environment. It reduces the need for complex setups and integrations, allowing you to
 focus on building the core functionality and design of your website.
@@ -51,9 +52,8 @@ focus on building the core functionality and design of your website.
     - Types (storage, ajax, view)
     - Service (defines interface)
 - **MVC architecture**
-- **Pipeline for [Sass](https://sass-lang.com/) and [Pug](https://github.com/Joker/jade)**
-    - All in one docker with needed tools
-    - Jetbrains file watchers configuration
+- **Pipeline for [Sass](https://sass-lang.com/) and [Pug](https://github.
+  com/Joker/jade)**: All in one docker with needed tools
 
 - **Web framework integrated: [Fiber](https://.gofiber.io)**
     - Separation for static and main app
@@ -113,8 +113,9 @@ go install github.com/Phosmachina/vectra@latest
   vectra -p path/YourProject watch
   ```
 
-If you want to re-edit the configuration, maybe after that run a partial generation like 
+If you want to re-edit the configuration, maybe after that run a partial generation like
 this to avoid file overwriting:
+
 ```shell
 vectra -p path/YourProject -s types,controlers,services gen
 ```
@@ -149,14 +150,33 @@ contributions!
 Improving and expanding this project is my perpetual goal.
 Here's an insight into what I plan next:
 
-- **Component architecture**: I want to provide a simple way to develop components by
-  simplify the boilerplate between view and controller.
-- **Default components**: In the future, I plan to incorporate a set of
-  default components into the project. This will help in establishing a
-  consistent UI/UX throughout and will also save time and effort in design and
-  development.
+### Shortly
+
+- **`pack` and `run` vectra command**: Provide an easy way to build the application,
+  assemble it in a folder with all into a folder with all the necessary files.
+  Run the pack command and run the executable.
+- **Improve Pug Watcher**: Currently there are some drawbacks: some files are compiled,
+  but they shouldn't and vice versa (about layout and pug files that don't have a page in
+  the in general).
+- **Add dynamic rebuilding for dev****: Like [air](https://github.com/cosmtrek/air).
+
+### Planned
+
+- **Sprite Generator (svg/img)**: It would be nice if you could just put svg and img in
+  into a folder and have the sprite generated automatically with js/pug
+  helper to use it.
+- **Component architecture**: Make a system to permit designing atomic component
+  composed by a view, client and server logic and a configuration.
+
+### Under consideration
+
 - **RBAC, ACL robust system**: Replace the current system with a robust and proven
-  system like Casbin. This integration should help to deal with complex access management.
+  system like Casbin.
+  This integration should help to deal with complex access management.
+  Could be also an update for my project FluentKV.
+- **Default components**: Incorporate a set of default components into the project.
+  This will help in establishing a consistent UI/UX throughout and will also save time and
+  effort in design and development.
 
 I value your ideas, contributions, and feedback. Stay tuned for the next steps on this
 exciting journey!
