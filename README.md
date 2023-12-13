@@ -52,8 +52,8 @@ focus on building the core functionality and design of your website.
     - Types (storage, ajax, view)
     - Service (defines interface)
 - **MVC architecture**
-- **Pipeline for [Sass](https://sass-lang.com/) and [Pug](https://github.
-  com/Joker/jade)**: All in one docker with needed tools
+- **Pipeline for [Sass](https://sass-lang.com/) and 
+  [Pug](https://github.com/Joker/jade)**: All in one docker with needed tools
 
 - **Web framework integrated: [Fiber](https://.gofiber.io)**
     - Separation for static and main app
@@ -158,7 +158,7 @@ Here's an insight into what I plan next:
 - **Improve Pug Watcher**: Currently there are some drawbacks: some files are compiled,
   but they shouldn't and vice versa (about layout and pug files that don't have a page in
   the in general).
-- **Add dynamic rebuilding for dev****: Like [air](https://github.com/cosmtrek/air).
+- **Add dynamic rebuilding for dev**: Like [air](https://github.com/cosmtrek/air).
 
 ### Planned
 
