@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"bufio"
 	"fmt"
 	"gopkg.in/yaml.v3"
 	"log"
@@ -360,6 +361,17 @@ func (v *Vectra) FullReport() {
 }
 
 func (v *Vectra) FullGenerate() {
+
+	fmt.Println("Warning: Full generation may override many files. Do you wish to continue? (yes/no)")
+	text, _ := bufio.NewReader(os.Stdin).ReadString('\n')
+	response := strings.ToLower(strings.TrimSpace(text))
+
+	if response != "yes" {
+
+		fmt.Println("Full generation aborted.")
+		return
+	}
+
 	for _, g := range v.generators {
 		g.Generate()
 	}
