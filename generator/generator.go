@@ -555,6 +555,7 @@ func formatGoCode(input *bytes.Buffer) error {
 
 	return nil
 }
+
 func getLastModifiedTimes(filePaths []string) ([]time.Time, error) {
 	var modifiedTimes []time.Time
 

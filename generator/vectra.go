@@ -13,9 +13,12 @@ import (
 
 var (
 	defaultVectra = Vectra{
-		DefaultLang:          "en",
-		ListenTo:             "127.0.0.1:8100",
-		DevDomain:            "localhost:8100",
+		DefaultLang: "en",
+		NetConfDev: NetworkConfig{
+			Domain: "localhost",
+			Port:   8100,
+			IsIPv6: false,
+		},
 		WithGitignore:        true,
 		WithDockerDeployment: true,
 		WithI18nExample:      true,
@@ -46,6 +49,7 @@ var (
 					[]SimpleAttribute{
 						{Name: "IsDev", Type: "bool"},
 						{Name: "Domain", Type: "string"},
+						{Name: "Port", Type: "int"},
 						{Name: "TabTitle", Type: "string"},
 						{Name: "Lang", Type: "string"},
 						{Name: "Langs", Type: "[]string"},
@@ -163,9 +167,9 @@ var (
 			},
 		},
 		Configuration: []ConfigurationAttribute{
-			{SimpleAttribute{Name: "ListenTo", Type: "string"}, false},
-			{SimpleAttribute{Name: "DevDomain", Type: "string"}, false},
-			{SimpleAttribute{Name: "ProdDomain", Type: "string"}, false},
+			{SimpleAttribute{Name: "Domain", Type: "string"}, false},
+			{SimpleAttribute{Name: "Port", Type: "int"}, false},
+			{SimpleAttribute{Name: "IsIPv6", Type: "bool"}, false},
 			{SimpleAttribute{Name: "TabPrefix", Type: "string"}, false},
 			{SimpleAttribute{Name: "CurrentLang", Type: "string"}, true},
 			{SimpleAttribute{Name: "Roles", Type: "map[string]int"}, false},
@@ -174,15 +178,21 @@ var (
 	}
 )
 
+type NetworkConfig struct {
+	Domain string `yaml:"domain"`
+	Port   int    `yaml:"port"`
+	IsIPv6 bool   `yaml:"isIPv6"`
+}
+
 type Vectra struct {
 	generators  map[string]IGenerator `yaml:"-"`
 	ProjectPath string                `yaml:"-"`
+	isProdGen   bool                  `yaml:"-"`
 
+	NetConfProd          NetworkConfig                 `yaml:"net_conf_prod"`
+	NetConfDev           NetworkConfig                 `yaml:"net_conf_dev"`
 	ProjectName          string                        `yaml:"project_name"`
 	DefaultLang          string                        `yaml:"default_lang"`
-	ListenTo             string                        `yaml:"listen_to"`
-	DevDomain            string                        `yaml:"dev_domain"`
-	ProdDomain           string                        `yaml:"prod_domain"`
 	WithGitignore        bool                          `yaml:"with_gitignore"`
 	WithDockerDeployment bool                          `yaml:"with_docker_deployment"`
 	WithI18nExample      bool                          `yaml:"with_i18n_example"`

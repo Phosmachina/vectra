@@ -4,6 +4,7 @@ import (
 	. "Vectra/src/model/service"
 	. "Vectra/src/model/storage"
 	. "github.com/Phosmachina/FluentKV/reldb"
+	"strconv"
 )
 
 {{ with .ViewTypes }}
@@ -42,12 +43,7 @@ func {{ .Name }} (
 		User:     newUserCtx(userId),
 		Lang:     config.CurrentLang,
 		Langs:    Langs,
-		}
-
-		if ctx.IsDev {
-		ctx.Domain = config.DevDomain
-		} else {
-		ctx.Domain = config.ProdDomain
+		Domain:   config.Domain + ":" + strconv.Itoa(config.Port),
 		}
 
 		return ctx

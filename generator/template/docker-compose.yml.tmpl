@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "{{ .ProductionPort }}:{{ .ProductionPort }}"
+      - "{{ .Port }}:{{ .Port }}"
     environment:
       - TZ=Europe/Paris
     volumes:

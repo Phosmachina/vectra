@@ -70,7 +70,7 @@ func (i *Types) Generate() {
 
 	i.Generator.Generate(map[string]any{
 		"Configuration": map[string]any{
-			"IsDev":         true,
+			"IsDev":         !i.vectra.isProdGen,
 			"DefaultLang":   i.vectra.DefaultLang,
 			"Configuration": i.vectra.Configuration,
 		},

@@ -37,7 +37,7 @@ func NewBase(cfg *Vectra) *Generator {
 	if cfg.WithGitignore {
 		files = append(files, NewSourceFile(".gitignore", Copy))
 	}
-	if cfg.WithDockerDeployment {
+	if cfg.WithDockerDeployment && cfg.isProdGen {
 		files = append(files, NewDynSourceFile("docker-compose.yml.tmpl", "docker-compose.yml", Copy))
 		files = append(files, NewDynSourceFile("Dockerfile.tmpl", "Dockerfile", Copy))
 	}
@@ -50,9 +50,9 @@ func NewBase(cfg *Vectra) *Generator {
 			"WithPugExample",
 			"WithGitignore",
 			"WithDockerDeployment",
-			"ListenTo",
-			"DevDomain",
-			"ProdDomain",
+			"Domain",
+			"Port",
+			"IsIPv6",
 			"DefaultLang",
 		},
 		Report{
@@ -68,10 +68,18 @@ func NewBase(cfg *Vectra) *Generator {
 }
 
 func (i *Base) Generate() {
-	i.Generator.Generate(map[string]any{
-		"ListenTo":    i.vectra.ListenTo,
-		"DevDomain":   i.vectra.DevDomain,
-		"ProdDomain":  i.vectra.ProdDomain,
-		"DefaultLang": i.vectra.DefaultLang,
-	})
+
+	ctx := map[string]any{"DefaultLang": i.vectra.DefaultLang}
+
+	if i.vectra.isProdGen {
+		ctx["Domain"] = i.vectra.NetConfProd.Domain
+		ctx["Port"] = i.vectra.NetConfProd.Port
+		ctx["IsIPv6"] = i.vectra.NetConfProd.IsIPv6
+	} else {
+		ctx["Domain"] = i.vectra.NetConfDev.Domain
+		ctx["Port"] = i.vectra.NetConfDev.Port
+		ctx["IsIPv6"] = i.vectra.NetConfDev.IsIPv6
+	}
+
+	i.Generator.Generate(ctx)
 }

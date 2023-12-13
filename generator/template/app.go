@@ -20,6 +20,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"log"
+	"strconv"
 	"time"
 )
 
@@ -34,22 +35,23 @@ func main() {
 		panic(err)
 	}
 
-	currentDomain := getDomainName(IsDev)
 	hosts := map[string]*Host{}
 	store := session.New(session.Config{
 		KeyLookup:      "cookie:" + CookieNameForSession,
 		CookieSecure:   !IsDev,
 		CookieHTTPOnly: true,
 	})
+	cfg := GetApiV1().GetStore().Config
+	addr := cfg.Domain + ":" + strconv.Itoa(cfg.Port)
 
 	// Static
-	makeStatic(store, hosts, currentDomain)
+	makeStatic(store, hosts, addr)
 
 	// Website
-	makeWebsite(store, hosts, currentDomain)
+	makeWebsite(store, hosts, addr)
 
 	// Start the app
-	log.Fatal(createApp(hosts).Listen(GetApiV1().GetStore().Config.ListenTo))
+	log.Fatal(createApp(hosts).Listen(addr))
 }
 
 func makeStatic(store *session.Store, hosts map[string]*Host, currentDomain string) {
@@ -117,9 +119,16 @@ func makeWebsite(store *session.Store, hosts map[string]*Host, currentDomain str
 }
 
 func createApp(hosts map[string]*Host) *fiber.App {
+
+	tcp := fiber.NetworkTCP4
+	if GetApiV1().GetStore().Config.IsIPv6 {
+		tcp = fiber.NetworkTCP6
+	}
+
 	app := fiber.New(fiber.Config{
 		JSONEncoder: json.Marshal,
 		JSONDecoder: json.Unmarshal,
+		Network:     tcp,
 		ErrorHandler: func(ctx *fiber.Ctx, err error) error {
 			// Status code defaults to 500
 			code := fiber.StatusInternalServerError
@@ -157,11 +166,4 @@ func createApp(hosts map[string]*Host) *fiber.App {
 	})
 
 	return app
-}
-
-func getDomainName(isDev bool) string {
-	if isDev {
-		return GetApiV1().GetStore().Config.DevDomain
-	}
-	return GetApiV1().GetStore().Config.ProdDomain
 }
