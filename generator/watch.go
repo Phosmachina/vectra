@@ -28,7 +28,6 @@ func CreateDockerImage(dockerfileFileName string, imageName string) error {
 	}
 
 	if strings.TrimSpace(string(output)) != "" {
-		fmt.Printf("Image %s exists\n", imageName)
 		return nil
 	}
 
@@ -73,7 +72,6 @@ func CreateDockerContainer(containerName, projectPath, imageName string) error {
 	} else if err != nil {
 		return err
 	} else {
-		fmt.Printf("Container %s exists.\n", containerName)
 		return nil
 	}
 	// Create a new Docker container

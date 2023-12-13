@@ -247,9 +247,7 @@ func (v *Vectra) Watch() {
 
 	fmt.Println("========= Check docker =========")
 
-	if IsDockerInstalled() {
-		fmt.Println("Docker is correctly installed.")
-	} else {
+	if !IsDockerInstalled() {
 		fmt.Println("Docker is not correctly installed.")
 		return
 	}
