@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/fsnotify/fsnotify"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -201,4 +202,67 @@ func WatchFiles(rootFolder string, includePatterns, excludePatterns []string, de
 	<-done
 
 	return nil
+}
+
+func watchPug(v *Vectra) error {
+	return WatchFiles(filepath.Join(v.ProjectPath, "src", "view", "pug"),
+		[]string{".*\\.pug$"},
+		[]string{".*completion_variable.*"},
+		50, func(pth string) {
+			log.Print("PUG ", pth, " | ")
+			rel, _ := filepath.Rel(v.ProjectPath, pth)
+			c := fmt.Sprintf(
+				"docker exec %s jade -writer -pkg view -d /vectra/src/view/go /vectra/%s",
+				v.ProjectName+"_Pug",
+				rel,
+			)
+			_ = ExecuteCommand(c, false, true)
+			fmt.Println("Transpile DONE.")
+		},
+	)
+}
+
+func watchJS(v *Vectra) error {
+	return WatchFiles(filepath.Join(v.ProjectPath, "static", "js"),
+		[]string{"main.js$"},
+		[]string{"prod"},
+		200, func(pth string) {
+			log.Print("JS ", pth, " | ")
+			_ = ExecuteCommand(fmt.Sprintf(
+				"docker start %s_MinifyJS", v.ProjectName), false, true)
+			fmt.Println("Minify DONE.")
+		},
+	)
+}
+
+func watchI18n(v *Vectra) error {
+	return WatchFiles(filepath.Join(v.ProjectPath, "data", "i18n"),
+		[]string{".*en.*\\.ini$"},
+		[]string{},
+		200, func(pth string) {
+			log.Print("I18N helpers ", pth, " | ")
+			v.Generate("i18n")
+			fmt.Println("Generation DONE.")
+		},
+	)
+}
+
+func watchSass(v *Vectra) error {
+	return WatchFiles(filepath.Join(v.ProjectPath, "static", "css"),
+		[]string{".*\\.sass$", ".*\\.scss$"},
+		[]string{},
+		200, func(pth string) {
+			log.Print("CSS ", pth, " | ")
+			_ = ExecuteCommand(
+				fmt.Sprintf("docker start %s_Sass", v.ProjectName), false, true)
+			fmt.Print("Sass DONE, ")
+			_ = ExecuteCommand(
+				fmt.Sprintf("docker start %s_Autoprefixer", v.ProjectName), false, true)
+			fmt.Print("Autoprefixer DONE, ")
+			time.Sleep(400 * time.Millisecond)
+			_ = ExecuteCommand(
+				fmt.Sprintf("docker start %s_MinifyCSS", v.ProjectName), false, true)
+			fmt.Println("Minify DONE.")
+		},
+	)
 }

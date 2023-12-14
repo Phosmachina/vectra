@@ -9,12 +9,15 @@ import (
 	"path/filepath"
 	"reflect"
 	"strings"
-	"time"
 )
 
 var (
 	defaultVectra = Vectra{
 		DefaultLang: "en",
+		SpriteConfig: SpriteConfig{
+			SvgFolderPath:   "static/svg",
+			OutputSpriteSvg: "static/sprite",
+		},
 		NetConfDev: NetworkConfig{
 			Domain: "localhost",
 			Port:   8100,
@@ -190,6 +193,7 @@ type Vectra struct {
 	ProjectPath string                `yaml:"-"`
 	isProdGen   bool                  `yaml:"-"`
 
+	SpriteConfig         SpriteConfig                  `yaml:"sprite_config"`
 	NetConfProd          NetworkConfig                 `yaml:"net_conf_prod"`
 	NetConfDev           NetworkConfig                 `yaml:"net_conf_dev"`
 	ProjectName          string                        `yaml:"project_name"`
@@ -276,60 +280,15 @@ func (v *Vectra) Watch() {
 
 	fmt.Println("=========   Watching   =========")
 
-	go WatchFiles(filepath.Join(v.ProjectPath, "src", "view", "pug"),
-		[]string{".*\\.pug$"},
-		[]string{".*completion_variable.*"},
-		50, func(pth string) {
-			log.Print("PUG ", pth, " | ")
-			rel, _ := filepath.Rel(v.ProjectPath, pth)
-			c := fmt.Sprintf(
-				"docker exec %s jade -writer -pkg view -d /vectra/src/view/go /vectra/%s",
-				v.ProjectName+"_Pug",
-				rel,
-			)
-			_ = ExecuteCommand(c, false, true)
-			fmt.Println("Transpile DONE.")
-		},
-	)
+	go watchPug(v)
 
-	go WatchFiles(filepath.Join(v.ProjectPath, "static", "js"),
-		[]string{"main.js$"},
-		[]string{"prod"},
-		200, func(pth string) {
-			log.Print("JS ", pth, " | ")
-			_ = ExecuteCommand(fmt.Sprintf(
-				"docker start %s_MinifyJS", v.ProjectName), false, true)
-			fmt.Println("Minify DONE.")
-		},
-	)
+	go watchJS(v)
 
-	go WatchFiles(filepath.Join(v.ProjectPath, "data", "i18n"),
-		[]string{".*en.*\\.ini$"},
-		[]string{},
-		200, func(pth string) {
-			log.Print("I18N helpers ", pth, " | ")
-			v.Generate("i18n")
-			fmt.Println("Generation DONE.")
-		},
-	)
+	go watchI18n(v)
 
-	WatchFiles(filepath.Join(v.ProjectPath, "static", "css"),
-		[]string{".*\\.sass$", ".*\\.scss$"},
-		[]string{},
-		200, func(pth string) {
-			log.Print("CSS ", pth, " | ")
-			_ = ExecuteCommand(
-				fmt.Sprintf("docker start %s_Sass", v.ProjectName), false, true)
-			fmt.Print("Sass DONE, ")
-			_ = ExecuteCommand(
-				fmt.Sprintf("docker start %s_Autoprefixer", v.ProjectName), false, true)
-			fmt.Print("Autoprefixer DONE, ")
-			time.Sleep(400 * time.Millisecond)
-			_ = ExecuteCommand(
-				fmt.Sprintf("docker start %s_MinifyCSS", v.ProjectName), false, true)
-			fmt.Println("Minify DONE.")
-		},
-	)
+	go watchSass(v)
+
+	<-make(chan struct{})
 }
 
 func (v *Vectra) Init() {
@@ -375,9 +334,14 @@ func (v *Vectra) FullGenerate() {
 	for _, g := range v.generators {
 		g.Generate()
 	}
+	generateSpriteSvg(v)
 }
 
 func (v *Vectra) Generate(key string) {
+	if key == "sprite" {
+		generateSpriteSvg(v)
+		return
+	}
 	generator, ok := v.generators[key]
 	if !ok {
 		fmt.Println("The generator", key, "does not exist.")
