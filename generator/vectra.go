@@ -16,7 +16,7 @@ var (
 		DefaultLang: "en",
 		SpriteConfig: SpriteConfig{
 			SvgFolderPath:   "static/svg",
-			OutputSpriteSvg: "static/sprite",
+			OutputSpriteSvg: "static/svg/sprite",
 		},
 		NetConfDev: NetworkConfig{
 			Domain: "localhost",

@@ -24,7 +24,7 @@ function loadSvgSprite() {
 
     let loc = window.location
 
-    fetch(`${loc.protocol}//static.${loc.hostname}:${loc.port}/sprite`)
+    fetch(`${loc.protocol}//static.${loc.hostname}:${loc.port}/svg/sprite`)
         .then(response => response.text())
         .then(data => {
             document.querySelector("#svg-sprite").outerHTML = data
