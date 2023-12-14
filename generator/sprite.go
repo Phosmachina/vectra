@@ -33,7 +33,7 @@ func generateSpriteSvg(cfg *Vectra) {
 	defs := svg.CreateElement("defs")
 
 	// Pug file base
-	mixins := "mixin svg-%s()\n\tsvg(width='%s' height='%s' viewBox='%s')\n\t\tuse(href='#%s')\n\n"
+	mixins := "mixin svg-%s()\n\tsvg(%s viewBox='%s')\n\t\tuse(href='#%s')\n\n"
 
 	// It will store all the mixins
 	var pugContent string
@@ -56,30 +56,40 @@ func generateSpriteSvg(cfg *Vectra) {
 			continue
 		}
 
-		// extracting svg element id from path
-		path := strings.TrimSuffix(strings.TrimPrefix(file, root+"/"), ".svg")
+		path := strings.TrimSuffix(strings.TrimPrefix(file, root+"/"), ".svg") // extracting svg element id from path
 		path = strings.ReplaceAll(path, "/", "-")
 		symbol := defs.CreateElement("symbol")
 		symbol.CreateAttr("id", path)
-		symbol.AddChild(svg.Copy())
+
+		// To unwrap svg tag, copy the child elements directly under symbol
+		for _, child := range svg.ChildElements() {
+			symbol.AddChild(child.Copy())
+		}
 
 		viewBox := svg.SelectAttr("viewBox") // we need viewBox to create mixin
 		if viewBox == nil {
 			fmt.Println("viewBox attribute is not found in svg", file)
 			continue
 		}
-		width := svg.SelectAttr("width") // we need width to create mixin
-		if width == nil {
-			fmt.Println("width attribute  is not found in svg", file)
-			continue
-		}
-		height := svg.SelectAttr("height") // we need height to create mixin
-		if height == nil {
-			fmt.Println("height attribute  is not found in svg", file)
-			continue
-		}
-		pugContent += fmt.Sprintf(mixins, path, width.Value, height.Value, viewBox.Value, path)
 
+		var dimensions string // stores width or/and height
+
+		width := svg.SelectAttr("width") // we need width to create mixin
+		if width != nil {
+			dimensions += "width='" + width.Value + "' "
+		}
+
+		height := svg.SelectAttr("height") // we need height to create mixin
+		if height != nil {
+			dimensions += "height='" + height.Value + "' "
+		}
+
+		if dimensions == "" {
+			fmt.Println("Both width and height attributes are found in svg", file)
+			continue
+		}
+
+		pugContent += fmt.Sprintf(mixins, path, strings.TrimSpace(dimensions), viewBox.Value, path)
 	}
 
 	err = os.WriteFile(filepath.Join(
