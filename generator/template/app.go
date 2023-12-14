@@ -5,8 +5,6 @@ import (
 	"Vectra/src/model/i18n"
 	. "Vectra/src/model/service"
 	. "Vectra/src/model/storage"
-	view "Vectra/src/view/go"
-	"bytes"
 	"errors"
 	"fmt"
 	"github.com/goccy/go-json"
@@ -64,11 +62,6 @@ func makeStatic(store *session.Store, hosts map[string]*Host, currentDomain stri
 		Storage:      store.Storage,
 		CacheControl: true,
 	}))
-	static.Get("sprite", func(ctx *fiber.Ctx) error {
-		var buf = new(bytes.Buffer)
-		view.Jade_sprite(buf)
-		return ctx.Send(buf.Bytes())
-	})
 	static.Static("/", "./static", fiber.Static{
 		Compress: true,
 	})
