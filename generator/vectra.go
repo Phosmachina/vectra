@@ -14,6 +14,22 @@ import (
 var (
 	defaultVectra = Vectra{
 		DefaultLang: "en",
+		WatcherConfig: WatcherConfig{
+			PugConfig: PugConfig{
+				Watcher:            Watcher{IsEnabled: true},
+				LayoutFilePattern:  ".*layout.*",
+				IgnoredFilePattern: ".*(component|shared).*",
+			},
+			SassConfig: SassConfig{
+				Watcher{IsEnabled: true},
+			},
+			JsConfig: JsConfig{
+				Watcher{IsEnabled: true},
+			},
+			I18nConfig: I18nConfig{
+				Watcher{IsEnabled: true},
+			},
+		},
 		SpriteConfig: SpriteConfig{
 			SvgFolderPath:   "static/svg",
 			OutputSpriteSvg: "static/svg/sprite",
@@ -182,18 +198,13 @@ var (
 	}
 )
 
-type NetworkConfig struct {
-	Domain string `yaml:"domain"`
-	Port   int    `yaml:"port"`
-	IsIPv6 bool   `yaml:"isIPv6"`
-}
-
 type Vectra struct {
 	generators  map[string]IGenerator `yaml:"-"`
 	ProjectPath string                `yaml:"-"`
 	isProdGen   bool                  `yaml:"-"`
 
-	SpriteConfig         SpriteConfig                  `yaml:"sprite_config"`
+	WatcherConfig        `yaml:"watcher_config"`
+	SpriteConfig         `yaml:"sprite_config"`
 	NetConfProd          NetworkConfig                 `yaml:"net_conf_prod"`
 	NetConfDev           NetworkConfig                 `yaml:"net_conf_dev"`
 	ProjectName          string                        `yaml:"project_name"`
@@ -204,10 +215,10 @@ type Vectra struct {
 	WithSassExample      bool                          `yaml:"with_sass_example"`
 	WithPugExample       bool                          `yaml:"with_pug_example"`
 	StorageTypes         []VectraType[SimpleAttribute] `yaml:"storage_types"`
-	ViewTypes            ViewTypes                     `yaml:"view_types"`
-	Controllers          []Controller                  `yaml:"controllers"`
-	Services             []Service                     `yaml:"services"`
-	Configuration        []ConfigurationAttribute      `yaml:"configuration"`
+	ViewTypes            `yaml:"view_types"`
+	Controllers          []Controller             `yaml:"controllers"`
+	Services             []Service                `yaml:"services"`
+	Configuration        []ConfigurationAttribute `yaml:"configuration"`
 }
 
 func NewVectra(projectPath string) *Vectra {
@@ -257,7 +268,17 @@ func (v *Vectra) Watch() {
 		return
 	}
 
-	images := []string{"Autoprefixer", "Pug", "Sass", "MinifyJS", "MinifyCSS"}
+	var images []string
+	if v.WatcherConfig.SassConfig.IsEnabled {
+		images = append(images, "MinifyCSS", "Sass", "Autoprefixer")
+	}
+	if v.WatcherConfig.PugConfig.IsEnabled {
+		images = append(images, "Pug")
+	}
+	if v.WatcherConfig.JsConfig.IsEnabled {
+		images = append(images, "MinifyJS")
+	}
+
 	for _, image := range images {
 		imageName := "phosmachina/" + strings.ToLower(image)
 		err := CreateDockerImage(image+".Dockerfile", imageName)
@@ -280,13 +301,21 @@ func (v *Vectra) Watch() {
 
 	fmt.Println("=========   Watching   =========")
 
-	go watchPug(v)
+	if v.WatcherConfig.PugConfig.IsEnabled {
+		go watchPug(v)
+	}
 
-	go watchJS(v)
+	if v.WatcherConfig.JsConfig.IsEnabled {
+		go watchJS(v)
+	}
 
-	go watchI18n(v)
+	if v.WatcherConfig.I18nConfig.IsEnabled {
+		go watchI18n(v)
+	}
 
-	go watchSass(v)
+	if v.WatcherConfig.SassConfig.IsEnabled {
+		go watchSass(v)
+	}
 
 	<-make(chan struct{})
 }
@@ -357,6 +386,14 @@ func (v *Vectra) Report(key string) {
 		return
 	}
 	generator.PrintReport()
+}
+
+func (v *Vectra) Pack() {
+	// TODO generate docker files
+}
+
+func (v *Vectra) Run() {
+
 }
 
 func (v *Vectra) GetFieldsAsMap(paths []string) map[string]any {
@@ -444,4 +481,20 @@ func generatorsToMap(g ...*Generator) map[string]IGenerator {
 	}
 
 	return m
+}
+
+// visit is a function that returns a filepath.WalkFunc used
+// for visiting files and directories recursively in a specified directory
+// and appending file paths with a specific extension.
+func visit(files *[]string, ext string) filepath.WalkFunc {
+	return func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			fmt.Printf("prevent panic by handling failure accessing a path %q: %v\n", path, err)
+			return err
+		}
+		if !info.IsDir() && strings.HasSuffix(info.Name(), ext) {
+			*files = append(*files, path)
+		}
+		return nil
+	}
 }

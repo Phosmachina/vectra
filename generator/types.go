@@ -53,7 +53,7 @@ func NewTypes(cfg *Vectra) *Generator {
 				NewSourceFile("src/model/storage/types.go.tmpl", FullGen),
 				NewSourceFile("src/view/go/view.go.tmpl", Skeleton),
 			},
-			Version: 1,
+			Version: 2,
 		}, cfg)
 
 	n := &Types{}

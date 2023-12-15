@@ -1,5 +1,11 @@
 package generator
 
+type NetworkConfig struct {
+	Domain string `yaml:"domain"`
+	Port   int    `yaml:"port"`
+	IsIPv6 bool   `yaml:"isIPv6"`
+}
+
 type Base struct {
 	*Generator
 }
@@ -50,14 +56,13 @@ func NewBase(cfg *Vectra) *Generator {
 			"WithPugExample",
 			"WithGitignore",
 			"WithDockerDeployment",
-			"Domain",
-			"Port",
-			"IsIPv6",
+			"NetConfDev",
+			"NetConfProd",
 			"DefaultLang",
 		},
 		Report{
 			Files:   files,
-			Version: 1,
+			Version: 2,
 		}, cfg)
 
 	n := &Base{}

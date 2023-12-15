@@ -20,22 +20,22 @@ func generateSpriteSvg(cfg *Vectra) {
 	var files []string
 	root := filepath.Join(cfg.ProjectPath, cfg.SpriteConfig.SvgFolderPath)
 
-	err := filepath.Walk(root, visit(&files))
+	err := filepath.Walk(root, visit(&files, ".svg"))
 	if err != nil {
 		panic(err)
 	}
 
-	// The base of your sprite file
+	// The base of the new sprite file.
 	sprite := etree.NewDocument()
-	sprite.CreateProcInst("xml", `version="1.0" encoding="UTF-8"`)
 	svg := sprite.CreateElement("svg")
 	svg.CreateAttr("xmlns", "http://www.w3.org/2000/svg")
+	svg.CreateAttr("height", "0")
 	defs := svg.CreateElement("defs")
 
-	// Pug file base
+	// Pug mixin template.
 	mixins := "mixin svg-%s()\n\tsvg(%s viewBox='%s')\n\t\tuse(href='#%s')\n\n"
 
-	// It will store all the mixins
+	// It will store all the mixins for the new Pug file.
 	var pugContent string
 
 	for _, file := range files {
@@ -56,30 +56,31 @@ func generateSpriteSvg(cfg *Vectra) {
 			continue
 		}
 
-		path := strings.TrimSuffix(strings.TrimPrefix(file, root+"/"), ".svg") // extracting svg element id from path
+		path := strings.TrimSuffix(strings.TrimPrefix(file, root+"/"), ".svg")
 		path = strings.ReplaceAll(path, "/", "-")
 		symbol := defs.CreateElement("symbol")
 		symbol.CreateAttr("id", path)
 
-		// To unwrap svg tag, copy the child elements directly under symbol
+		// To unwrap svg tag, copy the child elements directly under symbol.
 		for _, child := range svg.ChildElements() {
 			symbol.AddChild(child.Copy())
 		}
 
-		viewBox := svg.SelectAttr("viewBox") // we need viewBox to create mixin
+		// Stores viewBox to create mixin.
+		viewBox := svg.SelectAttr("viewBox")
 		if viewBox == nil {
 			fmt.Println("viewBox attribute is not found in svg", file)
 			continue
 		}
 
-		var dimensions string // stores width or/and height
+		var dimensions string // Stores width or/and height
 
-		width := svg.SelectAttr("width") // we need width to create mixin
+		width := svg.SelectAttr("width")
 		if width != nil {
 			dimensions += "width='" + width.Value + "' "
 		}
 
-		height := svg.SelectAttr("height") // we need height to create mixin
+		height := svg.SelectAttr("height")
 		if height != nil {
 			dimensions += "height='" + height.Value + "' "
 		}
@@ -117,18 +118,5 @@ func generateSpriteSvg(cfg *Vectra) {
 		minified, 0644)
 	if err != nil {
 		fmt.Println("Minified Sprite file writing error", err)
-	}
-}
-
-func visit(files *[]string) filepath.WalkFunc {
-	return func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			fmt.Printf("prevent panic by handling failure accessing a path %q: %v\n", path, err)
-			return err
-		}
-		if !info.IsDir() && strings.HasSuffix(info.Name(), ".svg") {
-			*files = append(*files, path)
-		}
-		return nil
 	}
 }

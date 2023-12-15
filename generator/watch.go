@@ -14,6 +14,34 @@ import (
 	"time"
 )
 
+type WatcherConfig struct {
+	PugConfig  `yaml:"pug_config"`
+	SassConfig `yaml:"sass_config"`
+	JsConfig   `yaml:"js_config"`
+	I18nConfig `yaml:"i18n_config"`
+}
+
+type Watcher struct {
+	IsEnabled bool `yaml:"is_enabled"`
+}
+
+type PugConfig struct {
+	Watcher            `yaml:",inline"`
+	LayoutFilePattern  string `yaml:"layout_file_pattern"`
+	IgnoredFilePattern string `yaml:"ignored_file_pattern"`
+}
+
+type SassConfig struct {
+	Watcher `yaml:",inline"`
+}
+
+type JsConfig struct {
+	Watcher `yaml:",inline"`
+}
+type I18nConfig struct {
+	Watcher `yaml:",inline"`
+}
+
 func IsDockerInstalled() bool {
 	err := ExecuteCommand("docker version", false, true)
 	return err == nil
@@ -122,7 +150,32 @@ func ExecuteCommand(command string, printStandardOutput bool, printErrorOutput b
 	return nil
 }
 
+// WatchFiles watches recursively a root folder for file changes
+// and triggers a task when a file that matches the include patterns
+// and does not match the exclude patterns is written.
+//
+// Parameters:
+//
+// - rootFolder: The root folder to watch for file changes.
+//
+// - includePatterns: The patterns for files to include in the watch.
+// Only files that match any of the include patterns are considered.
+//
+// - excludePatterns: The patterns for files to exclude from the watch.
+// Files that match any of the exclude patterns are ignored.
+//
+// - delay: The delay in milliseconds before triggering the task after a file is written.
+//
+// - task: The task to be executed when a file that matches the include patterns
+// and does not match the exclude patterns is written.
+//
+// Returns:
+//
+// - error: An error if any occurred, otherwise nil.
 func WatchFiles(rootFolder string, includePatterns, excludePatterns []string, delay int, task func(string)) error {
+
+	// TODO handle remove event (for pug for example)
+
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		return fmt.Errorf("failed to create watcher: %w", err)
@@ -205,19 +258,59 @@ func WatchFiles(rootFolder string, includePatterns, excludePatterns []string, de
 }
 
 func watchPug(v *Vectra) error {
-	return WatchFiles(filepath.Join(v.ProjectPath, "src", "view", "pug"),
+
+	pugConfig := v.WatcherConfig.PugConfig
+	layoutPattern, _ := regexp.Compile(pugConfig.LayoutFilePattern)
+	ignoredPattern, _ := regexp.Compile(pugConfig.IgnoredFilePattern)
+	root := filepath.Join(v.ProjectPath, "src", "view", "pug")
+
+	pugFilesToBeCompiled := func() []string {
+		var files []string
+		if err := filepath.Walk(root, visit(&files, ".pug")); err != nil {
+			fmt.Printf("error walking the path %v: %v\n", root, err)
+			return nil
+		}
+
+		var filteredFiles []string
+		for _, file := range files {
+			// Exclude files that match layoutPattern or ignoredPattern
+			if !layoutPattern.MatchString(file) && !ignoredPattern.MatchString(file) {
+				filteredFiles = append(filteredFiles, file)
+			}
+		}
+
+		return filteredFiles
+	}
+
+	compileInDocker := func(file string) {
+		c := fmt.Sprintf(
+			"docker exec %s jade -writer -pkg view -d /vectra/src/view/go /vectra/%s",
+			v.ProjectName+"_Pug",
+			file,
+		)
+		_ = ExecuteCommand(c, false, true)
+	}
+
+	return WatchFiles(
+		root,
 		[]string{".*\\.pug$"},
 		[]string{".*completion_variable.*"},
-		50, func(pth string) {
-			log.Print("PUG ", pth, " | ")
-			rel, _ := filepath.Rel(v.ProjectPath, pth)
-			c := fmt.Sprintf(
-				"docker exec %s jade -writer -pkg view -d /vectra/src/view/go /vectra/%s",
-				v.ProjectName+"_Pug",
-				rel,
-			)
-			_ = ExecuteCommand(c, false, true)
-			fmt.Println("Transpile DONE.")
+		200,
+		func(pth string) {
+			relPth, _ := filepath.Rel(v.ProjectPath, pth)
+			if layoutPattern.MatchString(relPth) {
+				// Get all files excluding layout and ignored ones.
+				files := pugFilesToBeCompiled()
+				for _, file := range files {
+					rel, _ := filepath.Rel(v.ProjectPath, file)
+					compileInDocker(rel)
+				}
+			} else if !ignoredPattern.MatchString(relPth) {
+				compileInDocker(relPth)
+			} else {
+				return // Avoid log.
+			}
+			log.Print("PUG ", relPth, " | Transpile DONE.")
 		},
 	)
 }
@@ -227,10 +320,11 @@ func watchJS(v *Vectra) error {
 		[]string{"main.js$"},
 		[]string{"prod"},
 		200, func(pth string) {
-			log.Print("JS ", pth, " | ")
-			_ = ExecuteCommand(fmt.Sprintf(
-				"docker start %s_MinifyJS", v.ProjectName), false, true)
-			fmt.Println("Minify DONE.")
+			_ = ExecuteCommand(
+				fmt.Sprintf("docker start %s_MinifyJS", v.ProjectName), false, true)
+
+			relPth, _ := filepath.Rel(v.ProjectPath, pth)
+			log.Print("JS ", relPth, " | Minify DONE.")
 		},
 	)
 }
@@ -240,9 +334,9 @@ func watchI18n(v *Vectra) error {
 		[]string{".*en.*\\.ini$"},
 		[]string{},
 		200, func(pth string) {
-			log.Print("I18N helpers ", pth, " | ")
 			v.Generate("i18n")
-			fmt.Println("Generation DONE.")
+			relPth, _ := filepath.Rel(v.ProjectPath, pth)
+			log.Print("I18N helpers ", relPth, " | Generation DONE.")
 		},
 	)
 }
@@ -252,17 +346,16 @@ func watchSass(v *Vectra) error {
 		[]string{".*\\.sass$", ".*\\.scss$"},
 		[]string{},
 		200, func(pth string) {
-			log.Print("CSS ", pth, " | ")
 			_ = ExecuteCommand(
 				fmt.Sprintf("docker start %s_Sass", v.ProjectName), false, true)
-			fmt.Print("Sass DONE, ")
 			_ = ExecuteCommand(
 				fmt.Sprintf("docker start %s_Autoprefixer", v.ProjectName), false, true)
-			fmt.Print("Autoprefixer DONE, ")
 			time.Sleep(400 * time.Millisecond)
 			_ = ExecuteCommand(
 				fmt.Sprintf("docker start %s_MinifyCSS", v.ProjectName), false, true)
-			fmt.Println("Minify DONE.")
+
+			relPth, _ := filepath.Rel(v.ProjectPath, pth)
+			log.Print("CSS ", relPth, " | Sass, Autoprefixer, Minify DONE.")
 		},
 	)
 }
