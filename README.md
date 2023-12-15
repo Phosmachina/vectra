@@ -140,8 +140,8 @@ Here's an insight into what I plan next:
 
 ### Planned
 
-- **Sprite Generator (svg/img)**: It would be nice if you could just put svg and img in
-  into a folder and have the sprite generated automatically with js/pug
+- **Sprite Generator (img)**: It would be nice if you could just put img in
+  into a folder and have the sprite generated automatically with js
   helper to use it.
 - **Component architecture**: Make a system to permit designing atomic component
   composed by a view, client and server logic and a configuration.

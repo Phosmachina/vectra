@@ -16,7 +16,7 @@ func main() {
 	app.Name = "vectra"
 	app.Usage = "Manage Vectra projects: initialize projet, report current state, " +
 		"and generate files following configuration"
-	app.Version = "1.0.1"
+	app.Version = "1.1.0"
 
 	app.EnableBashCompletion = true
 
@@ -64,6 +64,20 @@ func main() {
 			Action: func(c *cli.Context) error {
 				vectra.Watch()
 				return nil
+			},
+		},
+		{
+			Name:  "pack",
+			Usage: "Statically build your Vectra-based application and copy all necessary files to the target directory.",
+			Action: func(c *cli.Context) error {
+				vectra.Pack()
+				return nil
+			},
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "output, o",
+					Usage: "Path to the directory where the pack result will be exported.",
+				},
 			},
 		},
 	}

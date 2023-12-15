@@ -2,11 +2,41 @@
 
 ## VNext
 
+## 1.1.0
+
+### Features
+
+- Add templating for configuration and separate fields used for production, and those 
+  only used for dev.
+- Add svg sprite generator: 
+  -️ Recursively takes svg files,
+  -️ Auto name symbol from a path,
+  -️ Make mixin for simple usage,
+  -️ Minify the final result.
+- Add watcher configuration permitting to disable watcher individually.
+- Improve Pug Watcher: now you can define in config your layout files and all normal 
+  pug files are transpiled when layout is edited.
+
+### Refactor
+
+- Move reports of generators in a subdirectory `.vectra/report/`.
+  This permits a better separation between configuration and reports.
+- Inline some yaml tag for composed types.
+  Edit your config file and inline all `base` tags.  
+
+### Fixes
+
+- On template view types, add a parameters, `IsPageCtx`, to add the possibility to define
+  multiple `GlobalCtx` (It's currently impossible to define the return type of
+  constructor: it's inferred by name).
+- For exchange type generation: now the json tag is build with a Camel to Snake
+  transformation, not just `ToLower`.
+
 ## 1.0.1
 
 ### Features
 
-- Add a generator selector flag for CLI. This allows selecting multiple but not all 
+- Add a generator selector flag for CLI. This allows selecting multiple but not all
   generators for reporting and generation.
 
 ### Style
