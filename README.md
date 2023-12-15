@@ -9,28 +9,6 @@
 
 </div>
 
-<details>
-<summary>
- Table of contents
-</summary>
-
-<!-- TOC -->
-  * [🎯 Overview](#-overview)
-  * [⚡️ Features](#-features)
-  * [🚀 Getting started](#-getting-started)
-    * [Prerequisite](#prerequisite)
-    * [Install Vectra](#install-vectra)
-    * [Deploy](#deploy)
-    * [Run](#run)
-  * [🤝 Contributing](#-contributing)
-  * [🕘 What's next](#-whats-next)
-    * [Shortly](#shortly)
-    * [Planned](#planned)
-    * [Under consideration](#under-consideration)
-<!-- TOC -->
-
-</details>
-
 ## 🎯 Overview
 
 The main goal of the project is to create a versatile multi-language template and toolkit
