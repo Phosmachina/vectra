@@ -23,13 +23,13 @@ type SimpleAttribute struct {
 }
 
 type AttributeWithTag struct {
-	SimpleAttribute `yaml:"base"`
+	SimpleAttribute `yaml:",inline"`
 	ModTag          string `yaml:"mod"`
 	ValidatorTag    string `yaml:"validator"`
 }
 
 type ConfigurationAttribute struct {
-	SimpleAttribute `yaml:"base"`
+	SimpleAttribute `yaml:",inline"`
 	IsTransient     bool `yaml:"is_transient"`
 }
 
